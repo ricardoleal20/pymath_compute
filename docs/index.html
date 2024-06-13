@@ -1,0 +1,238 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>PyMathCompute</title>
+    <link rel="stylesheet" href="https://github.com/ricardoleal20/pymath_compute/blob/main/docs/styles.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/simple-line-icons/2.5.5/css/simple-line-icons.css">
+    <link rel="icon" href="https://github.com/ricardoleal20/pymath_compute/blob/main/docs/public/logo.png" type="image/png">
+    <style>
+        body {
+            margin: 0;
+            padding: 0;
+            font-family: 'Arial', sans-serif;
+            background-color: #1d1f20;
+            color: #fff;
+            overflow-x: hidden;
+        }
+
+        .navbar {
+            background-color: rgba(29, 31, 32, 0.9); /* Color semi transparente */
+            overflow: hidden;
+            position: fixed;
+            top: 0;
+            width: 100%;
+            backdrop-filter: blur(10px); /* Efecto de desenfoque */
+            -webkit-backdrop-filter: blur(10px); /* Para navegadores webkit */
+            z-index: 1000;
+        }
+
+        .navbar a {
+            float: right;
+            display: block;
+            color: #fff;
+            text-align: center;
+            padding: 14px 20px;
+            text-decoration: none;
+            font-size: 17px;
+        }
+
+        .navbar a:hover {
+            background-color: #333; /* Cambio de color de hover */
+            color: #fff;
+        }
+
+        .navbar .github-logo {
+            float: left;
+            display: block;
+            padding: 10px;
+        }
+
+        .github-logo img {
+            width: 30px; /* Tamaño del ícono */
+            height: 30px;
+            border-radius: 50%;
+        }
+
+        .main-content {
+            background-color: rgba(29, 31, 32, 0.9); /* Color semi transparente */
+            padding: 40px;
+            text-align: center;
+            margin-top: 100px; /* Para separar del navbar */
+            border-radius: 10px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.5);
+            max-width: 600px; /* Tamaño máximo del contenedor */
+            margin-left: auto;
+            margin-right: auto;
+            backdrop-filter: blur(10px); /* Efecto de desenfoque */
+            -webkit-backdrop-filter: blur(10px); /* Para navegadores webkit */
+            z-index: 900;
+        }
+
+        .main-content h1 {
+            font-size: 3.5rem;
+            margin-bottom: 20px;
+        }
+
+        .main-content p {
+            font-size: 1.0rem; /* Tamaño más chico */
+            line-height: 1.6;
+            margin-bottom: 40px;
+            color: #ccc; /* Color gris-blanco */
+        }
+
+        .footer {
+            text-align: center;
+            padding: 20px;
+            background-color: rgba(29, 31, 32, 0.9); /* Color semi transparente */
+            color: #fff;
+            position: fixed;
+            bottom: 0;
+            width: 100%;
+            backdrop-filter: blur(10px); /* Efecto de desenfoque */
+            -webkit-backdrop-filter: blur(10px); /* Para navegadores webkit */
+            z-index: 1000;
+        }
+
+        .documentation-icon {
+            position: relative;
+            display: inline-block;
+            font-size: 24px;
+            margin-left: 20px;
+            color: #fff;
+            transition: margin-left 0.3s ease;
+        }
+
+        .documentation-icon::after {
+            content: "Documentation";
+            position: absolute;
+            background-color: #333;
+            color: #fff;
+            font-size: 14px;
+            padding: 6px 12px;
+            border-radius: 4px;
+            left: -110px;
+            top: 10px;
+            opacity: 0;
+            transition: opacity 0.3s ease, left 0.3s ease;
+            white-space: nowrap;
+            pointer-events: none;
+            transform: translateX(-10px);
+        }
+
+        .documentation-icon:hover::after {
+            opacity: 1;
+            left: 40px;
+            transform: translateX(0);
+        }
+
+        .documentation-icon:hover i {
+            transform: translateX(-10px);
+        }
+
+        .background {
+            position: fixed;
+            width: 100%;
+            height: 100%;
+            top: 0;
+            left: 0;
+            z-index: -1;
+            pointer-events: none;
+            background: url('https://www.transparenttextures.com/patterns/asfalt-light.png');
+            animation: animatedBackground 10s ease infinite;
+        }
+
+        @keyframes animatedBackground {
+            0% {
+                background-position: 0% 0%;
+            }
+            50% {
+                background-position: 100% 100%;
+            }
+            100% {
+                background-position: 0% 0%;
+            }
+        }
+
+        .background div {
+            position: absolute;
+            width: 10px;
+            height: 10px;
+            background-color: rgba(255, 255, 255, 0.1);
+            border-radius: 50%;
+            animation: animateElement 10s linear infinite;
+        }
+
+        @keyframes animateElement {
+            0% {
+                transform: translate(0, 0);
+            }
+            100% {
+                transform: translate(100vw, 100vh);
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="navbar">
+        <a href="https://github.com/ricardoleal20/pymath_compute" class="github-logo">
+            <i class="icon-social-github"></i>
+        </a>
+        <a href="#home" class="home-icon"><i class="icon-home"></i></a> <!-- Ícono de casa -->
+        <a href="documentation.html" class="documentation-icon">
+            <i class="icon-doc"></i>
+        </a>
+    </div>
+
+    <div class="main-content" id="home">
+        <h1>PyMathCompute</h1>
+        <p>
+            <strong>PyMathCompute</strong> is a Python tool designed to handle mathematical variables, create and evaluate mathematical expressions, and perform various mathematical optimizations. This library is ideal for those working in applied mathematics, optimization, and related fields.
+        </p>
+    </div>
+
+    <div class="footer">
+        <p>This page was made by <a href="https://github.com/ricardoleal20">Ricardo Leal</a> with love and effort!</p>
+    </div>
+
+    <div class="background"></div>
+
+    <script>
+        // Animación de fondo
+        const background = document.querySelector('.background');
+        let animatedBackground = "";
+        let counter = 0;
+
+        function createElements() {
+            for (let i = 0; i < 30; i++) {
+                const el = document.createElement('div');
+                el.className = `element${i + 1}`;
+                background.appendChild(el);
+            }
+        }
+
+        function animateBackground() {
+            counter++;
+            for (let i = 0; i < 30; i++) {
+                const el = document.querySelector(`.element${i + 1}`);
+                el.style.width = `${Math.random() * 15}px`;
+                el.style.height = `${Math.random() * 15}px`;
+                el.style.left = `${Math.random() * 100}%`;
+                el.style.top = `${Math.random() * 100}%`;
+                el.style.animationDuration = `${Math.random() * 15 + 5}s`;
+                el.style.animationDelay = `-${Math.random() * 5}s`;
+            }
+        }
+
+        createElements();
+        animateBackground();
+
+        setInterval(() => {
+            background.innerHTML = "";
+            createElements();
+            animateBackground();
+        }, 20000);
+    </script>
+</body>
+</html>
