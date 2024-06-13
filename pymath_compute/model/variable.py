@@ -154,7 +154,7 @@ class Variable:
     def __pow__(self, power_value: int) -> 'MathExpression':
         if isinstance(power_value, int) and power_value >= 0:
             return MathExpression({(self,)*power_value: 1})  # type: ignore
-        raise NotImplementedError(
+        raise TypeError(
             "For the moment, the only power values " +
             "that we have implemented are: [int]."
         )

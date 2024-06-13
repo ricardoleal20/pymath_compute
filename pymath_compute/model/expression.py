@@ -117,6 +117,10 @@ class MathExpression:
                 new_terms['const'] += other
             else:
                 new_terms['const'] = other
+        # If add is not on the expected params
+        else:
+            raise ValueError(
+                f"The param {other} of type {type(other)} is not supported.")
         # Return the new MathExpression
         return MathExpression(new_terms)
 
@@ -152,11 +156,17 @@ class MathExpression:
             else:
                 new_terms[other] = 1
             return MathExpression(new_terms)
-        # If not, raise an error
+        if isinstance(other, MathExpression):
+            # Get the new terms
+            new_terms = {}
+            # Iterate over the terms of this expression
+            for o_term, o_coef in other.terms.items():
+                for term, coef in self.terms.items():
+                    new_terms[(term, o_term)] = coef*o_coef
+            return MathExpression(new_terms)
+        # If add is not on the expected params
         raise ValueError(
-            "The MathExpression only allow us to add " +
-            "integers, floats or another Variable."
-        )
+            f"The param {other} of type {type(other)} is not supported.")
 
     def __rmul__(self, other: PosibleOperators) -> 'MathExpression':
         return self.__mul__(other)
@@ -166,6 +176,17 @@ class MathExpression:
     # ////////////////////////// #
 
     def __sub__(self, other: PosibleOperators) -> 'MathExpression':
+        print(
+            type(other).__name__,
+            type(other).__name__ in ["Variable", "MathFunction"],
+            type(other).__name__ == "Variable"
+        )
+        # Evaluate that the other parameter is a valid expression
+        if not isinstance(other, (int, float, MathExpression)) \
+                and not type(other).__name__ in ["Variable", "MathFunction"]:
+            raise ValueError(
+                f"The param {other} of type {type(other)} is not supported.")
+
         return self.__add__(-other)  # type: ignore
 
     def __rsub__(self, other: PosibleOperators) -> 'MathExpression':
@@ -182,3 +203,23 @@ class MathExpression:
         # Obtain the new negative terms
         new_terms = {var: -coef for var, coef in self.terms.items()}
         return MathExpression(new_terms)
+
+    # ////////////////////////// #
+    #         POW METHODS        #
+    # ////////////////////////// #
+    def __pow__(self, other: int) -> 'MathExpression':
+        if not isinstance(other, int):
+            raise ValueError(
+                f"The param {other} of type {type(other)} is not supported.")
+        if other < 0:
+            raise ValueError("The power has to be greater or equal to zero.")
+        if other == 0:
+            # Make everything 1
+            self.terms = {"const": 1}
+            return self
+        # Multiply the self instance n times
+        new_expr: MathExpression = self
+        for _ in range(other):
+            new_expr = self * self
+        # Return it
+        return new_expr
