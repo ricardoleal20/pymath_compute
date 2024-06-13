@@ -6,7 +6,7 @@ the creation and manipulation of mathematical expressions involving variables, c
 and functions. The expressions can be evaluated given a set of variable values.
 """
 # Local import
-from model.types import PosibleOperators, MathematicalTerms
+from pymath_compute.model.types import PosibleOperators, MathematicalTerms
 
 
 class MathExpression:
@@ -93,7 +93,7 @@ class MathExpression:
     # ////////////////////////// #
     #         ADD METHODS        #
     # ////////////////////////// #
-    def __add__(self, other: PosibleOperators) -> 'MathExpression':  # pylint: disable=W0612
+    def __add__(self, other: PosibleOperators) -> 'MathExpression':  # pylint: disable=R0912
         # Obtain the new terms
         new_terms = self.terms.copy()
         if type(other).__name__ == "Variable":

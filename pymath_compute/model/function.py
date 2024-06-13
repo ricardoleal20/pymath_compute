@@ -6,9 +6,9 @@ the creation and manipulation of mathematical functions involving variables. The
 functions can be evaluated given a set of variable values.
 """
 from typing import Callable, TypeVar, TYPE_CHECKING
-from model.expression import MathExpression
+from pymath_compute.model.expression import MathExpression
 if TYPE_CHECKING:
-    from model.variable import Variable
+    from pymath_compute.model.variable import Variable
 
 FunctionReturn = TypeVar("FunctionReturn", int, float)
 
@@ -56,8 +56,8 @@ class MathFunction:
         """
         if self.variable.name not in values:
             raise ValueError(
-                f"The variable {
-                    self.variable.name} is not in the given values."
+                f"The variable {self.variable.name}" +
+                " is not in the given values."
             )
         return self.function(values[self.variable.name])
 

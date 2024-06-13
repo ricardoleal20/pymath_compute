@@ -10,6 +10,6 @@ Includes:
     - Variable
     - MathExpression
 """
-from .function import MathFunction
-from .variable import Variable
-from .expression import MathExpression
+from pymath_compute.model.function import MathFunction
+from pymath_compute.model.variable import Variable
+from pymath_compute.model.expression import MathExpression

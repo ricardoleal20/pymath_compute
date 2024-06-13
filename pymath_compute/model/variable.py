@@ -7,8 +7,8 @@ mathematical operations.
 """
 from typing import Optional
 # Local imports
-from model.types import PosibleOperators
-from model.expression import MathExpression
+from pymath_compute.model.types import PosibleOperators
+from pymath_compute.model.expression import MathExpression
 
 
 class Variable:
@@ -58,7 +58,7 @@ class Variable:
         Returns:
             float: The current value of the variable.
         """
-        return self._value
+        return self._value if self._value else 0.0
 
     @value.setter
     def value(self, new_value: float) -> None:
