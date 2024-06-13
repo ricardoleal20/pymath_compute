@@ -1,7 +1,7 @@
 [tool.poetry]
 name = "pymath_compute"
 version = "0.1.0"
-description = ""
+description = "Tool to handle mathematical operations using Variables and Mathematical Expressions."
 authors = ["ricardoleal20 <rick.leal420@gmail.com>"]
 license = "MIT"
 readme = "README.md"
