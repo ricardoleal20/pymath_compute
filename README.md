@@ -1,6 +1,6 @@
 # PyMathCompute
 
-<img src="https://github.com/ricardoleal20/pymath_compute/blob/main/docs/public/logo.png" />
+<img src="https://github.com/ricardoleal20/pymath_compute/blob/main/docs/public/banner.jpg" />
 
 **PyMathCompute** is a Python tool designed to handle mathematical variables, create and evaluate mathematical expressions, and perform various mathematical optimizations. This library is ideal for those working in applied mathematics, optimization, and related fields.
 
