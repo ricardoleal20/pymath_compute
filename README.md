@@ -1,6 +1,6 @@
 # PyMathCompute
 
-<img src="https://github.com/ricardoleal20/pymath_compute/blob/main/docs/public/banner.jpg" />
+<img src="https://github.com/ricardoleal20/pymath_compute/blob/main/docs/public/banner.jpg" width="60%" height="60%" />
 
 **PyMathCompute** is a Python tool designed to handle mathematical variables, create and evaluate mathematical expressions, and perform various mathematical optimizations. This library is ideal for those working in applied mathematics, optimization, and related fields.
 
@@ -9,6 +9,7 @@
 - **Variable**: Defines mathematical variables with lower and upper bounds.
 - **MathExpression**: Creates and evaluates mathematical expressions using defined variables.
 - **Mathematical Operations**: Supports addition, subtraction, multiplication, and exponentiation of variables and expressions.
+- **Special mathematical operations**: Also allow us to interact with special operators such as e, sin, cos and others.
 
 ## Installation
 
@@ -91,7 +92,3 @@ Contributions are welcome. If you have suggestions, bug reports, or improvements
 ## License
 
 This project is licensed under the MIT License - see the [LICENSE](https://github.com/ricardoleal20/pymath_compute/blob/main/LICENSE) file for details.
-
----
-
-We hope PyMathCompute is useful for your mathematical and optimization needs. Happy calculating!
