@@ -18,16 +18,20 @@ def replace_path_in_files(
     og_files: dict[str, str] = {}
     # Iterate over all the files inside the directory
     for filename in os.listdir(directory):
+        if os.path.isdir(directory+f"/{filename}"):
+            og_files.update(
+                replace_path_in_files(directory+f"/{filename}", path_var, path)
+            )
         if filename.endswith(".html"):
             filepath = os.path.join(directory, filename)
-            with open(filepath, "r") as file:
+            with open(filepath, "r", encoding="utf-8") as file:
                 filedata = file.read()
             # Store this file as it is original
             og_files[filepath] = filedata
             # Replace all coincidences with the new text
             filedata = filedata.replace(path_var, path)
             # Write the files once again
-            with open(filepath, "w") as file:
+            with open(filepath, "w", encoding="utf-8") as file:
                 file.write(filedata)
     return og_files
 
@@ -35,7 +39,7 @@ def replace_path_in_files(
 def restart_files(og_files: dict[str, str]) -> None:
     """Reset the files that suffer a replace in the path"""
     for filepath, filedata in og_files.items():
-        with open(filepath, "w") as file:
+        with open(filepath, "w", encoding="utf-8") as file:
             file.write(filedata)
 
 

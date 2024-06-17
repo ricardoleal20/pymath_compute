@@ -1,0 +1,37 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>PyMathCompute Documentation - Introduction</title>
+    <link rel="stylesheet" href="{PATH}/documentation/styles.css">
+    <link rel="icon" href="https://github.com/ricardoleal20/pymath_compute/blob/main/docs/public/logo.png" type="image/png">
+</head>
+<body>
+    <div class="navbar">
+        <a href="{PATH}/index.html" class="home-icon"><i class="icon-home"></i></a>
+        <a href="https://github.com/ricardoleal20/pymath_compute" class="github-logo">
+            <img src="https://simpleicons.org/icons/github.svg" alt="GitHub">
+        </a>
+    </div>
+
+    <div class="sidebar">
+        <a href="{PATH}/documentation/index.html">Introduction</a>
+        <a href="{PATH}/documentation/basic-usage.html">Basic Usage</a>
+        <a href="{PATH}/documentation/math-expressions.html">Math Expressions</a>
+        <a href="{PATH}/documentation/math-functions.html">Mathematical Functions</a>
+    </div>
+
+    <div class="main-content">
+        <h1 id="special-operations">Mathematical Operators</h1>
+        <pre><code>from numpy import np
+from pymath_compute import Variable, MathFunction
+
+# Create the variables
+x = Variable(name="x", lower_bound=0, upper_bound=np.pi)
+
+# Add a function to calculate the sin of x
+sin = MathFunction(np.sin, x)</code></pre>
+    </div>
+</body>
+</html>
