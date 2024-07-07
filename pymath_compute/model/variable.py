@@ -17,7 +17,9 @@ class Variable:
     Attributes:
         name (str): The name of the variable.
         lower_bound (float): The lower bound of the variable's range.
+            Default to -infinite
         upper_bound (float): The upper bound of the variable's range.
+            Default to infinite
     """
     name: str
     lower_bound: float
@@ -29,8 +31,8 @@ class Variable:
     def __init__(
         self,
         name: str,
-        lower_bound: int | float,
-        upper_bound: int | float
+        lower_bound: Optional[int | float] = float("-inf"),
+        upper_bound: Optional[int | float] = float("inf")
     ) -> None:
         # Evaluate that the parameters are correct
         if not isinstance(name, str):
