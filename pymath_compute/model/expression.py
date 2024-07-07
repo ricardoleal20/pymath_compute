@@ -6,7 +6,7 @@ the creation and manipulation of mathematical expressions involving variables, c
 and functions. The expressions can be evaluated given a set of variable values.
 """
 # Local import
-from pymath_compute.model.types import PosibleOperators, MathematicalTerms
+from pymath_compute.model.types import Operators, MathematicalTerms
 
 
 class MathExpression:
@@ -93,7 +93,7 @@ class MathExpression:
     # ////////////////////////// #
     #         ADD METHODS        #
     # ////////////////////////// #
-    def __add__(self, other: PosibleOperators) -> 'MathExpression':  # pylint: disable=R0912
+    def __add__(self, other: Operators) -> 'MathExpression':  # pylint: disable=R0912
         # Obtain the new terms
         new_terms = self.terms.copy()
         if type(other).__name__ == "Variable":
@@ -124,14 +124,14 @@ class MathExpression:
         # Return the new MathExpression
         return MathExpression(new_terms)
 
-    def __radd__(self, other: PosibleOperators) -> 'MathExpression':
+    def __radd__(self, other: Operators) -> 'MathExpression':
         return self.__add__(other)
 
     # ////////////////////////// #
     #   MULTIPLICATION METHODS   #
     # ////////////////////////// #
 
-    def __mul__(self, other: PosibleOperators) -> 'MathExpression':
+    def __mul__(self, other: Operators) -> 'MathExpression':
         # Evaluate if the thing to evaluate is a int or a float
         if isinstance(other, (int, float)):
             # Get a new terms expression by multiplying everything that we have
@@ -168,14 +168,14 @@ class MathExpression:
         raise ValueError(
             f"The param {other} of type {type(other)} is not supported.")
 
-    def __rmul__(self, other: PosibleOperators) -> 'MathExpression':
+    def __rmul__(self, other: Operators) -> 'MathExpression':
         return self.__mul__(other)
 
     # ////////////////////////// #
     #     SUBTRACT METHODS       #
     # ////////////////////////// #
 
-    def __sub__(self, other: PosibleOperators) -> 'MathExpression':
+    def __sub__(self, other: Operators) -> 'MathExpression':
         print(
             type(other).__name__,
             type(other).__name__ in ["Variable", "MathFunction"],
@@ -189,7 +189,7 @@ class MathExpression:
 
         return self.__add__(-other)  # type: ignore
 
-    def __rsub__(self, other: PosibleOperators) -> 'MathExpression':
+    def __rsub__(self, other: Operators) -> 'MathExpression':
         # The (-self) invoques the __neg__ method and returns which value
         # we'll expect from it. Since we define the __neg__ method here, we already
         # know that we're going to get a new MathExpression with the negative values.

@@ -79,7 +79,7 @@ class MathFunction:
             return MathExpression({self: 1, 'const': other})
         # Evaluate the name of the type
         var_type_name = type(other).__name__
-        if var_type_name == "Variable" or var_type_name == "MathExpression":
+        if var_type_name in {"Variable", "MathExpression"}:
             return MathExpression({self: 1, other: 1})
 
         raise ValueError("There's no implemented addition for this two types.")

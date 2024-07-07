@@ -7,7 +7,7 @@ mathematical operations.
 """
 from typing import Optional
 # Local imports
-from pymath_compute.model.types import PosibleOperators
+from pymath_compute.model.types import Operators, Bound
 from pymath_compute.model.expression import MathExpression
 
 
@@ -16,9 +16,9 @@ class Variable:
 
     Attributes:
         name (str): The name of the variable.
-        lower_bound (float): The lower bound of the variable's range.
+        lb (int | float): The lower bound of the variable's range.
             Default to -infinite
-        upper_bound (float): The upper bound of the variable's range.
+        ub (int | float): The upper bound of the variable's range.
             Default to infinite
     """
     name: str
@@ -31,26 +31,26 @@ class Variable:
     def __init__(
         self,
         name: str,
-        lower_bound: Optional[int | float] = float("-inf"),
-        upper_bound: Optional[int | float] = float("inf")
+        lb: Bound = float("-inf"),
+        ub: Bound = float("inf")
     ) -> None:
         # Evaluate that the parameters are correct
         if not isinstance(name, str):
             raise TypeError("The name should be a string, but instead" +
                             f" is {type(name)}.")
-        if not isinstance(lower_bound, (int, float)) or not isinstance(upper_bound, (int, float)):
+        if not isinstance(lb, (int, float)) or not isinstance(ub, (int, float)):
             raise TypeError(
                 "The lower bound and the upper bound should be" +
                 " floats, but instead they are: " +
-                f"LB={type(lower_bound)} | UP={type(upper_bound)}."
+                f"LB={type(lb)} | UP={type(ub)}."
             )
-        if lower_bound > upper_bound:
+        if lb > ub:
             raise ValueError("The lower bound should be lower than the upper bound" +
-                             f" but we have LB={lower_bound}>UP={upper_bound}.")
+                             f" but we have LB={lb} > UP={ub}.")
         # If everything is okay, set the values
         self.name = name
-        self.lower_bound = lower_bound
-        self.upper_bound = upper_bound
+        self.lower_bound = lb
+        self.upper_bound = ub
         self._value = None
 
     @property
@@ -95,7 +95,7 @@ class Variable:
     # ////////////////////////// #
     #         ADD METHODS        #
     # ////////////////////////// #
-    def __add__(self, other: PosibleOperators) -> 'MathExpression':
+    def __add__(self, other: Operators) -> 'MathExpression':
         # Evaluate if the other param is a Variable
         if isinstance(other, Variable):
             return MathExpression({self: 1, other: 1})
@@ -110,14 +110,14 @@ class Variable:
             f"Cannot append {other} of type {type(other)} as a expression."
         )
 
-    def __radd__(self, other: PosibleOperators) -> 'MathExpression':
+    def __radd__(self, other: Operators) -> 'MathExpression':
         return self.__add__(other)
 
     # ////////////////////////// #
     #   MULTIPLICATION METHODS   #
     # ////////////////////////// #
 
-    def __mul__(self, other: PosibleOperators) -> 'MathExpression':
+    def __mul__(self, other: Operators) -> 'MathExpression':
         if isinstance(other, Variable):
             return MathExpression({(self, other): 1})
         if type(other).__name__ == "MathFunction":
@@ -129,17 +129,17 @@ class Variable:
             f"Cannot append {other} of type {type(other)} as a expression."
         )
 
-    def __rmul__(self, other: PosibleOperators) -> 'MathExpression':
+    def __rmul__(self, other: Operators) -> 'MathExpression':
         return self.__mul__(other)
 
     # ////////////////////////// #
     #     SUBTRACT METHODS       #
     # ////////////////////////// #
 
-    def __sub__(self, other: PosibleOperators) -> 'MathExpression':
+    def __sub__(self, other: Operators) -> 'MathExpression':
         return self.__add__(other)
 
-    def __rsub__(self, other: PosibleOperators) -> 'MathExpression':
+    def __rsub__(self, other: Operators) -> 'MathExpression':
         return -self.__sub__(other)
 
     # ////////////////////////// #
