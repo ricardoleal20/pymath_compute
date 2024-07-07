@@ -163,3 +163,6 @@ cython_debug/
 
 # Ignore the DS_STORE of MAC
 .DS_STORE
+
+# Ignore the .vscode folder
+.vscode/
