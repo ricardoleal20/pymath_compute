@@ -45,21 +45,21 @@ class MathExpression:
         for var, coef in self.terms.items():
             # If the var is a constant, don't do
             # anything but adding them to the result
-            if var == "const":
+            if var == "const" and isinstance(var, str):
                 result += coef
             elif type(var).__name__ == "Variable":
-                if var.name not in values:
+                if var.name not in values:  # type: ignore
                     raise ValueError(
                         "In the given values, we're missing the" +
-                        f" following variable '{var.name}'."
+                        f" following variable '{var.name}'."  # type: ignore
                     )
-                result += coef*values[var.name]
+                result += coef*values[var.name]  # type: ignore
             elif type(var).__name__ == "MathFunction":
-                result += coef * var.evaluate(values)
+                result += coef * var.evaluate(values)  # type: ignore
             else:
                 # Define a sub term for this
                 sub_term = 1
-                for v in var:
+                for v in var:  # type: ignore
                     sub_term *= values[v.name]
                 # In this situation, multiply the coef for the appended value
                 result += coef * sub_term
@@ -74,13 +74,15 @@ class MathExpression:
             if var == "const":
                 printable_terms.append(str(coef))
             elif type(var).__name__ == "Variable":
-                printable_terms.append(f"{coef}*{var.name}")
+                printable_terms.append(f"{coef}*{var.name}")  # type: ignore
             elif type(var).__name__ == "MathFunction":
                 printable_terms.append(f"{coef}*{var}")
             else:
                 # Define the str of the term
-                # type: ignore
-                term_str = '*'.join(v.name for v in var if not isinstance(v, str))
+                term_str = '*'.join(
+                    v.name for v in var  # type: ignore
+                    if not isinstance(v, str)
+                )
                 # Define the printable terms here
                 printable_terms.append(f"{coef}*{term_str}")
         # Return the expression with a join
@@ -98,25 +100,25 @@ class MathExpression:
         new_terms = self.terms.copy()
         if type(other).__name__ == "Variable":
             if other in new_terms:
-                new_terms[other] += 1
+                new_terms[other] += 1  # type: ignore
             else:
-                new_terms[other] = 1
+                new_terms[other] = 1  # type: ignore
         elif isinstance(other, MathExpression):
             for var, coef in other.terms.items():
                 if var in new_terms:
-                    new_terms[var] += coef
+                    new_terms[var] += coef  # type: ignore
                 else:
-                    new_terms[var] = coef
+                    new_terms[var] = coef  # type: ignore
         elif type(other).__name__ == "MathFunction":
             if other in new_terms:
-                new_terms[other] += 1
+                new_terms[other] += 1  # type: ignore
             else:
-                new_terms[other] = 1
+                new_terms[other] = 1  # type: ignore
         elif isinstance(other, (int, float)):
             if 'const' in new_terms:
-                new_terms['const'] += other
+                new_terms['const'] += other  # type: ignore
             else:
-                new_terms['const'] = other
+                new_terms['const'] = other  # type: ignore
         # If add is not on the expected params
         else:
             raise ValueError(
@@ -152,9 +154,9 @@ class MathExpression:
         if type(other).__name__ == "MathFunction":
             new_terms = self.terms.copy()
             if other in new_terms:
-                new_terms[other] += 1
+                new_terms[other] += 1  # type: ignore
             else:
-                new_terms[other] = 1
+                new_terms[other] = 1  # type: ignore
             return MathExpression(new_terms)
         if isinstance(other, MathExpression):
             # Get the new terms
@@ -202,7 +204,7 @@ class MathExpression:
     def __neg__(self) -> 'MathExpression':
         # Obtain the new negative terms
         new_terms = {var: -coef for var, coef in self.terms.items()}
-        return MathExpression(new_terms)
+        return MathExpression(new_terms)  # type: ignore
 
     # ////////////////////////// #
     #         POW METHODS        #

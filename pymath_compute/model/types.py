@@ -1,10 +1,11 @@
 """
 Get types to use in common around the model definition
 """
-from typing import TypeVar, Dict, TYPE_CHECKING
+from typing import TypeVar, Union, Dict, TYPE_CHECKING
 
 if TYPE_CHECKING:
     from pymath_compute.model.variable import Variable
+    from pymath_compute.model.function import MathFunction
     from pymath_compute.model.expression import MathExpression
 
 # ===================================== #
@@ -13,7 +14,7 @@ if TYPE_CHECKING:
 Operators = TypeVar(
     "Operators",
     # Math the operators
-    'Variable',  'MathExpression',  int, float
+    'Variable',  'MathExpression', int, float
 )
 Term = TypeVar("Term", str, "Variable")
 # Define the bound
@@ -22,4 +23,15 @@ Bound = TypeVar("Bound", int, float)
 # ===================================== #
 #                Terms                  #
 # ===================================== #
-MathematicalTerms = Dict[Term, float]
+MathematicalTerms = Dict[
+    Union[
+        "Variable",
+        "MathFunction",
+        tuple["Variable", "Variable"],
+        str
+    ],
+    float | int
+] | Dict[
+    Union["Variable", "MathExpression", int, float],
+    int | float
+]
