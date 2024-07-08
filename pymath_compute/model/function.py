@@ -5,7 +5,7 @@ This module provides the implementation of the `MathFunction` class, which allow
 the creation and manipulation of mathematical functions involving variables. The 
 functions can be evaluated given a set of variable values.
 """
-from typing import Callable, TypeVar, TYPE_CHECKING
+from typing import Callable, TypeVar, Union, TYPE_CHECKING
 from pymath_compute.model.expression import MathExpression
 if TYPE_CHECKING:
     from pymath_compute.model.variable import Variable
@@ -18,7 +18,8 @@ class MathFunction:
 
     Attributes:
         function (Callable[..., FunctionReturn]): The function to be evaluated.
-        variable (Variable): The variable involved in the function.
+        variable (Union[Variable, MathExpression]): The variable or expression
+                involved in the function.
 
     Example:
         ```
@@ -36,7 +37,7 @@ class MathFunction:
     def __init__(
         self,
         function: Callable[..., FunctionReturn],
-        variable: 'Variable'
+        variable: Union['Variable', MathExpression]
     ) -> None:
         self.function = function
         self.variable = variable
@@ -54,10 +55,11 @@ class MathFunction:
         Raises:
             ValueError: If the required variable is not included in the provided values.
         """
-        if self.variable.name not in values:
+        if isinstance(self.variable, MathExpression):
+            return self.function(self.variable.evaluate(values))
+        if type(self.variable).__name__ == "Variable" and self.variable.name not in values:
             raise ValueError(
-                f"The variable {self.variable.name}" +
-                " is not in the given values."
+                f"The variable {self.variable.name} is not in the given values."
             )
         return self.function(values[self.variable.name])
 
@@ -69,9 +71,8 @@ class MathFunction:
         """Plot this mathematical function with their corresponding limits"""
         self.to_expression().plot()
 
-
     def __repr__(self) -> str:
-        return f"{self.function.__name__}({self.variable.name})"
+        return f"{self.function.__name__}({self.variable})"
 
     # ============================================= #
     #      MATH OPERATIONS REPLACING SECTION        #
@@ -87,8 +88,7 @@ class MathFunction:
         if isinstance(other, (int, float)):
             return MathExpression({self: 1, 'const': other})
         # Evaluate the name of the type
-        var_type_name = type(other).__name__
-        if var_type_name in {"Variable", "MathExpression"}:
+        if type(other).__name__ in ("Variable", "MathExpression"):
             return MathExpression({self: 1, other: 1})
 
         raise ValueError("There's no implemented addition for this two types.")
