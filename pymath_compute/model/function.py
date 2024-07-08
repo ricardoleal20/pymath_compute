@@ -61,6 +61,15 @@ class MathFunction:
             )
         return self.function(values[self.variable.name])
 
+    def to_expression(self) -> 'MathExpression':
+        """Convert this Function into a MathExpression"""
+        return MathExpression({self: 1})
+
+    def plot(self) -> None:
+        """Plot this mathematical function with their corresponding limits"""
+        self.to_expression().plot()
+
+
     def __repr__(self) -> str:
         return f"{self.function.__name__}({self.variable.name})"
 

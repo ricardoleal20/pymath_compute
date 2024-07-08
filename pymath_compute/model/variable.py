@@ -83,9 +83,17 @@ class Variable:
             f" [{self.lower_bound}, {self.upper_bound}]."
         )
 
+    def to_expression(self) -> 'MathExpression':
+        """Convert this Variable into a MathExpression"""
+        return MathExpression({self: 1})
+
+    def plot(self) -> None:
+        """Plot this variable with their corresponding limits"""
+        self.to_expression().plot()
+
     def __repr__(self) -> str:
-        if self.value is not None:
-            return f"{self.name}: {self.value}"
+        if self._value is not None:
+            return f"{self.name}: {self._value}"
         return self.name
 
     # ============================================= #

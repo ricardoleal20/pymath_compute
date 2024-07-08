@@ -7,6 +7,7 @@ and functions. The expressions can be evaluated given a set of variable values.
 """
 # Local import
 from pymath_compute.model.types import Operators, MathematicalTerms
+from pymath_compute.model.graph import plot_math_expression
 
 
 class MathExpression:
@@ -66,6 +67,10 @@ class MathExpression:
         # In the end, return the result
         return result
 
+    def plot(self) -> None:
+        """Plot the Mathematical expression with the corresponding terms"""
+        plot_math_expression(self)
+
     def __repr__(self) -> str:
         expression: str = "Expression: "
         # Add the terms to print in the representation
@@ -116,15 +121,16 @@ class MathExpression:
                 new_terms[other] = 1  # type: ignore
         elif isinstance(other, (int, float)):
             if 'const' in new_terms:
-                new_terms['const'] += other  # type: ignore
+                new_terms['const'] += other
             else:
-                new_terms['const'] = other  # type: ignore
+                new_terms['const'] = other
         # If add is not on the expected params
         else:
             raise ValueError(
                 f"The param {other} of type {type(other)} is not supported.")
         # Return the new MathExpression
         return MathExpression(new_terms)
+
 
     def __radd__(self, other: Operators) -> 'MathExpression':
         return self.__add__(other)

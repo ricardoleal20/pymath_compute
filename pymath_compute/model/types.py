@@ -1,7 +1,7 @@
 """
 Get types to use in common around the model definition
 """
-from typing import TypeVar, Union, Dict, TYPE_CHECKING
+from typing import Literal, TypeVar, Union, Dict, TYPE_CHECKING
 
 if TYPE_CHECKING:
     from pymath_compute.model.variable import Variable
@@ -28,10 +28,17 @@ MathematicalTerms = Dict[
         "Variable",
         "MathFunction",
         tuple["Variable", "Variable"],
-        str
+        Literal["const"]
     ],
     float | int
 ] | Dict[
-    Union["Variable", "MathExpression", int, float],
+    Union[
+        "Variable",
+        "MathExpression",
+        "MathFunction",
+        Literal["const"],
+        int,
+        float
+    ],
     int | float
 ]
