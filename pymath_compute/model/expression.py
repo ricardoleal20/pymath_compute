@@ -5,9 +5,53 @@ This module provides the implementation of the `MathExpression` class, which all
 the creation and manipulation of mathematical expressions involving variables, constants,
 and functions. The expressions can be evaluated given a set of variable values.
 """
+from typing import Sequence, Optional
 # Local import
-from pymath_compute.model.types import PosibleOperators, MathematicalTerms
+from pymath_compute.model.types import Operators, MathematicalTerms
+from pymath_compute.utils.graph import plot_math_expression
 
+
+def _generate_terms(
+    items: Sequence,
+    visited_ids: Optional[list[int]] = None
+) -> tuple[list[str], list[int]]:
+    """Generate the terms from a list of items"""
+    terms = []
+    visited_ids = visited_ids if visited_ids else []
+    for item in items:
+        if id(item) in visited_ids:
+            continue
+        if isinstance(item, str):
+            terms.append(item)
+        if type(item).__name__ == "Variable":
+            terms.append(item.name)  # type: ignore
+        if type(item).__name__ == "MathFunction":
+            terms.append(f"{item}")
+        if isinstance(item, tuple):
+            new_terms, visited_ids = _generate_terms(item, visited_ids)
+            terms += new_terms
+    # Return the terms
+    return terms, visited_ids
+
+
+def _evaluate(
+    items: Sequence,
+    values: dict[str, int | float]
+) -> float:
+    """Evaluate elements in a iterative way"""
+    # Define the term
+    term = 1
+    # Iterate over the items
+    for item in items:
+        if type(item).__name__ == "Variable":
+            term *= values[item.name]
+        elif type(item).__name__ == "MathFunction":
+            term *= item.evaluate(values)  # type: ignore
+        elif isinstance(item, MathExpression):
+            term *= item.evaluate(values)
+        else:
+            term *= _evaluate(item, values)
+    return term
 
 class MathExpression:
     """Represents a mathematical expression, that can be a sum of two variables,
@@ -45,26 +89,26 @@ class MathExpression:
         for var, coef in self.terms.items():
             # If the var is a constant, don't do
             # anything but adding them to the result
-            if var == "const":
+            if var == "const" and isinstance(var, str):
                 result += coef
             elif type(var).__name__ == "Variable":
-                if var.name not in values:
+                if var.name not in values:  # type: ignore
                     raise ValueError(
                         "In the given values, we're missing the" +
-                        f" following variable '{var.name}'."
+                        f" following variable '{var.name}'."  # type: ignore
                     )
-                result += coef*values[var.name]
+                result += coef*values[var.name]  # type: ignore
             elif type(var).__name__ == "MathFunction":
-                result += coef * var.evaluate(values)
+                result += coef * var.evaluate(values)  # type: ignore
             else:
                 # Define a sub term for this
-                sub_term = 1
-                for v in var:
-                    sub_term *= values[v.name]
-                # In this situation, multiply the coef for the appended value
-                result += coef * sub_term
+                result += coef * _evaluate(var, values)  # type: ignore
         # In the end, return the result
         return result
+
+    def plot(self) -> None:
+        """Plot the Mathematical expression with the corresponding terms"""
+        plot_math_expression(self)
 
     def __repr__(self) -> str:
         expression: str = "Expression: "
@@ -74,13 +118,13 @@ class MathExpression:
             if var == "const":
                 printable_terms.append(str(coef))
             elif type(var).__name__ == "Variable":
-                printable_terms.append(f"{coef}*{var.name}")
+                printable_terms.append(f"{coef}*{var.name}")  # type: ignore
             elif type(var).__name__ == "MathFunction":
                 printable_terms.append(f"{coef}*{var}")
             else:
+                terms, _ = _generate_terms(var)  # type: ignore
                 # Define the str of the term
-                # type: ignore
-                term_str = '*'.join(v.name for v in var if not isinstance(v, str))
+                term_str = '*'.join(terms)
                 # Define the printable terms here
                 printable_terms.append(f"{coef}*{term_str}")
         # Return the expression with a join
@@ -93,25 +137,25 @@ class MathExpression:
     # ////////////////////////// #
     #         ADD METHODS        #
     # ////////////////////////// #
-    def __add__(self, other: PosibleOperators) -> 'MathExpression':  # pylint: disable=R0912
+    def __add__(self, other: Operators) -> 'MathExpression':  # pylint: disable=R0912
         # Obtain the new terms
         new_terms = self.terms.copy()
         if type(other).__name__ == "Variable":
             if other in new_terms:
-                new_terms[other] += 1
+                new_terms[other] += 1  # type: ignore
             else:
-                new_terms[other] = 1
+                new_terms[other] = 1  # type: ignore
         elif isinstance(other, MathExpression):
             for var, coef in other.terms.items():
                 if var in new_terms:
-                    new_terms[var] += coef
+                    new_terms[var] += coef  # type: ignore
                 else:
-                    new_terms[var] = coef
+                    new_terms[var] = coef  # type: ignore
         elif type(other).__name__ == "MathFunction":
             if other in new_terms:
-                new_terms[other] += 1
+                new_terms[other] += 1  # type: ignore
             else:
-                new_terms[other] = 1
+                new_terms[other] = 1  # type: ignore
         elif isinstance(other, (int, float)):
             if 'const' in new_terms:
                 new_terms['const'] += other
@@ -124,14 +168,15 @@ class MathExpression:
         # Return the new MathExpression
         return MathExpression(new_terms)
 
-    def __radd__(self, other: PosibleOperators) -> 'MathExpression':
+
+    def __radd__(self, other: Operators) -> 'MathExpression':
         return self.__add__(other)
 
     # ////////////////////////// #
     #   MULTIPLICATION METHODS   #
     # ////////////////////////// #
 
-    def __mul__(self, other: PosibleOperators) -> 'MathExpression':
+    def __mul__(self, other: Operators) -> 'MathExpression':
         # Evaluate if the thing to evaluate is a int or a float
         if isinstance(other, (int, float)):
             # Get a new terms expression by multiplying everything that we have
@@ -152,9 +197,9 @@ class MathExpression:
         if type(other).__name__ == "MathFunction":
             new_terms = self.terms.copy()
             if other in new_terms:
-                new_terms[other] += 1
+                new_terms[other] += 1  # type: ignore
             else:
-                new_terms[other] = 1
+                new_terms[other] = 1  # type: ignore
             return MathExpression(new_terms)
         if isinstance(other, MathExpression):
             # Get the new terms
@@ -168,14 +213,14 @@ class MathExpression:
         raise ValueError(
             f"The param {other} of type {type(other)} is not supported.")
 
-    def __rmul__(self, other: PosibleOperators) -> 'MathExpression':
+    def __rmul__(self, other: Operators) -> 'MathExpression':
         return self.__mul__(other)
 
     # ////////////////////////// #
     #     SUBTRACT METHODS       #
     # ////////////////////////// #
 
-    def __sub__(self, other: PosibleOperators) -> 'MathExpression':
+    def __sub__(self, other: Operators) -> 'MathExpression':
         print(
             type(other).__name__,
             type(other).__name__ in ["Variable", "MathFunction"],
@@ -189,7 +234,7 @@ class MathExpression:
 
         return self.__add__(-other)  # type: ignore
 
-    def __rsub__(self, other: PosibleOperators) -> 'MathExpression':
+    def __rsub__(self, other: Operators) -> 'MathExpression':
         # The (-self) invoques the __neg__ method and returns which value
         # we'll expect from it. Since we define the __neg__ method here, we already
         # know that we're going to get a new MathExpression with the negative values.
@@ -202,7 +247,7 @@ class MathExpression:
     def __neg__(self) -> 'MathExpression':
         # Obtain the new negative terms
         new_terms = {var: -coef for var, coef in self.terms.items()}
-        return MathExpression(new_terms)
+        return MathExpression(new_terms)  # type: ignore
 
     # ////////////////////////// #
     #         POW METHODS        #

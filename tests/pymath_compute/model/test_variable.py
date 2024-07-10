@@ -25,6 +25,18 @@ def test_create_variable():
 
 
 @pytest.mark.variable
+def test_create_variable_without_bounds():
+    """Test for the creation of a Variable instance.
+    
+    This test evaluates that if we do not provide any bounds
+    then the variable is going to have a unlimited range of values
+    """
+    var: Variable = Variable("x")
+    assert var.name == "x"
+    assert var.lower_bound == float("-inf")
+    assert var.upper_bound == float("inf")
+
+@pytest.mark.variable
 def test_set_valid_value():
     """Test setting a valid value to a Variable.
 
