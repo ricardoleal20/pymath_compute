@@ -5,10 +5,53 @@ This module provides the implementation of the `MathExpression` class, which all
 the creation and manipulation of mathematical expressions involving variables, constants,
 and functions. The expressions can be evaluated given a set of variable values.
 """
+from typing import Sequence, Optional
 # Local import
 from pymath_compute.model.types import Operators, MathematicalTerms
-from pymath_compute.model.graph import plot_math_expression
+from pymath_compute.utils.graph import plot_math_expression
 
+
+def _generate_terms(
+    items: Sequence,
+    visited_ids: Optional[list[int]] = None
+) -> tuple[list[str], list[int]]:
+    """Generate the terms from a list of items"""
+    terms = []
+    visited_ids = visited_ids if visited_ids else []
+    for item in items:
+        if id(item) in visited_ids:
+            continue
+        if isinstance(item, str):
+            terms.append(item)
+        if type(item).__name__ == "Variable":
+            terms.append(item.name)  # type: ignore
+        if type(item).__name__ == "MathFunction":
+            terms.append(f"{item}")
+        if isinstance(item, tuple):
+            new_terms, visited_ids = _generate_terms(item, visited_ids)
+            terms += new_terms
+    # Return the terms
+    return terms, visited_ids
+
+
+def _evaluate(
+    items: Sequence,
+    values: dict[str, int | float]
+) -> float:
+    """Evaluate elements in a iterative way"""
+    # Define the term
+    term = 1
+    # Iterate over the items
+    for item in items:
+        if type(item).__name__ == "Variable":
+            term *= values[item.name]
+        elif type(item).__name__ == "MathFunction":
+            term *= item.evaluate(values)  # type: ignore
+        elif isinstance(item, MathExpression):
+            term *= item.evaluate(values)
+        else:
+            term *= _evaluate(item, values)
+    return term
 
 class MathExpression:
     """Represents a mathematical expression, that can be a sum of two variables,
@@ -59,11 +102,7 @@ class MathExpression:
                 result += coef * var.evaluate(values)  # type: ignore
             else:
                 # Define a sub term for this
-                sub_term = 1
-                for v in var:  # type: ignore
-                    sub_term *= values[v.name]
-                # In this situation, multiply the coef for the appended value
-                result += coef * sub_term
+                result += coef * _evaluate(var, values)  # type: ignore
         # In the end, return the result
         return result
 
@@ -83,11 +122,9 @@ class MathExpression:
             elif type(var).__name__ == "MathFunction":
                 printable_terms.append(f"{coef}*{var}")
             else:
+                terms, _ = _generate_terms(var)  # type: ignore
                 # Define the str of the term
-                term_str = '*'.join(
-                    v.name for v in var  # type: ignore
-                    if not isinstance(v, str)
-                )
+                term_str = '*'.join(terms)
                 # Define the printable terms here
                 printable_terms.append(f"{coef}*{term_str}")
         # Return the expression with a join
