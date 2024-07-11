@@ -4,7 +4,7 @@ Index for my FrontEnd application
 
 import reflex as rx
 # Import all the pages.
-from docs.pages import index, documentation
+from docs.pages import index, documentation_pages
 
 
 # ========================================== #
@@ -30,4 +30,6 @@ app = rx.App(  # pylint: disable=E1102
 
 # Add the pages
 app.add_page(index, title="PyMath Compute", route="/")
-app.add_page(documentation, title="PyMath :: Introduction", route="/docs")
+for page in documentation_pages():
+    # raise RuntimeError(page, page.__metadata__)
+    app.add_page(page, **page.__metadata__)

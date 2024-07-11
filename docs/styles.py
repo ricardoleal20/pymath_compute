@@ -8,7 +8,7 @@ class Color(Enum):
     """Include the palette of colors"""
     PRIMARY = "#19C28C"
     SECONDARY = "#CEF1E6"
-    BACKGROUND = "white"
+    BACKGROUND = "#1E1E1E"
     BACKGROUND_CONTENT = "#F7F6F6"
     TEXT = "black"
     TEXT_SECONDARY = "white"
@@ -96,8 +96,9 @@ overlapping_button_style = {
 }
 
 markdown_style = {
+    "h1": lambda text: rx.heading(text, size=TextSizes.HEADING_H1.value),
     "code": lambda text: rx.code(text, color_scheme="gray"),
-    "codeblock": lambda text, **props: rx.code_block(text, **props, margin_y="1em"),
+    "codeblock": lambda text, **props: rx.code_block(text, **props, margin_y="1em", margin_x="2em"),
     "a": lambda text, **props: rx.link(
         text,
         **props,

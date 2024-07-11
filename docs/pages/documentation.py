@@ -1,16 +1,37 @@
 """
-Page for the documentation
+Include all the documentation pages here
 """
+from typing import Callable
+
 import reflex as rx
-# Local imports
+# Import the pages
+from docs.components import sidebar_section
+from docs import styles  # ! DELETE ME
 
 
-def documentation() -> rx.Component:
-    """Page for the documentation of the package
-    
-    Returns:
-        - The UI for the documentation page
-    """
-    return rx.box(
-        rx.text("hola xd")
+@sidebar_section(
+    page_title="Introduction :: PyMath Docs",
+    route="/docs",
+    sidebar_title="Introduction"
+)
+def introduction() -> rx.Component:
+    """Define the introduction to the package"""
+    with open("docs/content/introduction.md", encoding="utf-8") as md_file:
+        content = md_file.read()
+    return rx.markdown(
+        content,
+        component_map=styles.markdown_style,
+        align="center",
+        margin_top="2em"
     )
+
+
+# Define the function that would allow us to automatize the documentation process #
+
+
+def documentation_pages() -> list[Callable[..., rx.Component]]:
+    """Import and return all the documentation pages"""
+    # In the folder docs/content, read all the .md files available
+    return [
+        introduction,
+    ]
