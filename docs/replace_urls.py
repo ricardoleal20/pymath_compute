@@ -13,10 +13,11 @@ patterns = [
 def replace_patterns(url: str) -> None:
     """Replace the patterns in the URL"""
     # Get a list of all HTML files in the repository
-    
-    html_files: list[str] = []
-    html_files = [filename for filename in os.listdir(
-        '.') if filename.endswith('.html')]
+    html_files = []
+    for root, _, files in os.walk("."):
+        for file in files:
+            if file.endswith(".html"):
+                html_files.append(f"{root}/{file}")
     # Process each HTML file
     for filename in html_files:
         with open(filename, 'r', encoding='utf-8') as file:
