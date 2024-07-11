@@ -40,7 +40,7 @@ jobs:
         run: unzip frontend.zip
 
       - name: Inject page 💉
-        run: python replace_urls.py
+        run: python docs/replace_urls.py
         env:
           URL: ${{ steps.deployment.outputs.page_url }}
 
