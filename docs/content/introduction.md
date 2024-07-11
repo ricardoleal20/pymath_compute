@@ -1,4 +1,5 @@
 # PyMathCompute
+---
 
 **PyMathCompute** is a Python tool designed to handle mathematical variables, create and evaluate mathematical expressions, and perform various mathematical optimizations. This library is ideal for those working in applied mathematics, optimization, and related fields.
 
@@ -15,64 +16,6 @@ You can install PyMathCompute using pip:
 
 ```bash
 pip install pymath_compute
-```
-
-## Basic Usage
-
-### Defining Variables and Mathematical Expressions
-
-```python
-from pymath_compute import Variable
-
-# Create a variable
-x = Variable(name="x", lower_bound=0, upper_bound=10)
-
-# Create a mathematical expression
-expr = x + 2 * x - 5
-
-# Evaluate the expression
-values = {"x": 5}
-result = expr.evaluate(values)
-print(f"Result of the expression: {result}")
-```
-
-### Mathematical Operations
-
-PyMathCompute allows various mathematical operations with variables and expressions:
-
-```python
-from pymath_compute import Variable
-
-# Create variables
-x = Variable(name="x", lower_bound=0, upper_bound=10)
-y = Variable(name="y", lower_bound=0, upper_bound=10)
-
-# Create expressions
-expr1 = x + y
-expr2 = x * 2 + y ** 2
-
-# Evaluate expressions
-values = {"x": 3, "y": 4}
-result1 = expr1.evaluate(values)
-result2 = expr2.evaluate(values)
-
-print(f"Result of expr1: {result1}")
-print(f"Result of expr2: {result2}")
-```
-
-### Mathematical Operators
-
-PyMathCompute also allow connection with operators, as using `sin`, `cos`, `e`, and others. For this, we use the `MathFunction` parameter
-
-```python
-from numpy import np
-from pymath_compute import Variable, MathFunction
-
-# Create the variables
-x = Variable(name="x", lower_bound=0, upper_bound=np.pi)
-
-# Add a function to calculate the sin of x
-sin = MathFunction(np.sin, x)
 ```
 
 ## Future Plans
