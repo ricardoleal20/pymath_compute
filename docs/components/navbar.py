@@ -3,7 +3,7 @@ Include a navigation bar for the home page
 """
 import reflex as rx
 # Local imports
-from docs.styles import border_spacer, text_could_hover, button_secondary_hover
+from docs.styles import border_spacer, text_could_hover, Color
 
 
 def navbar():
@@ -13,7 +13,7 @@ def navbar():
             rx.hstack(
                 rx.text(""),
                 rx.hstack(
-                    navbar_link("Docs", "/docs"),
+                    navbar_link("Docs", "/docs", "book-open-text"),
                     justify="end",
                     spacing="5",
                     align="center"
@@ -28,7 +28,7 @@ def navbar():
             rx.hstack(
                 rx.text(""),
                 rx.hstack(
-                    navbar_link("Docs", "/docs"),
+                    navbar_link("Docs", "/docs", "book"),
                     justify="end",
                     spacing="5",
                     align="center"
@@ -63,15 +63,23 @@ def navbar():
 
 def navbar_link(
     text: str,
-    id_scroll: str
+    id_scroll: str,
+    icon: str = ""
 ):
     """Include a link for the Navigation Bar"""
     return rx.link(
-        rx.text(
-            text,
+        rx.hstack(
+            rx.icon(
+                icon,
+                size=25
+            ),
+            rx.text(
+                text,
+                style=text_could_hover
+            ),
             style=text_could_hover
         ),
         text_decoration="none",
-        color=rx.color_mode_cond(light="black", dark="white"),
+        color=Color.TEXT_SECONDARY,
         on_click=rx.redirect(id_scroll),
     )

@@ -6,7 +6,7 @@ import reflex as rx
 
 class Color(Enum):
     """Include the palette of colors"""
-    PRIMARY = "#19C28C"
+    PRIMARY = "#D16F00"
     SECONDARY = "#CEF1E6"
     BACKGROUND = "#1E1E1E"
     BACKGROUND_CONTENT = "#F7F6F6"
