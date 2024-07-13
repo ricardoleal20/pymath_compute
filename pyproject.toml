@@ -10,6 +10,7 @@ readme = "README.md"
 python = ">=3.10, <3.13"
 numpy = ">=1.26.4"
 scipy = ">=1.13.1"
+maturin = ">=1.7.0"
 matplotlib = ">=3.9.1"
 
 
@@ -17,15 +18,12 @@ matplotlib = ">=3.9.1"
 pytest = "~=8.2.2"
 pytest-cov = "~=5.0"
 pytest-xdist = "~=3.6.1"
-maturin = ">=1.7.0"
 reflex = ">=0.5.5"
 
 [build-system]
-requires = ["maturin>=1.7.0", "poetry-core>=1.0.0"]
+requires = ["maturin>=1.7.0"]
 build-backend = "maturin"
 
 [tool.maturin]
-name = "pymath_compute_engine"
-version = "0.1.0"
-description = "Tool to handle mathematical operations using Variables and Mathematical Expressions."
-authors = ["ricardoleal20 <rick.leal420@gmail.com>"]
+bindings = "pyo3"
+module-name = "pymath_compute.engine"
