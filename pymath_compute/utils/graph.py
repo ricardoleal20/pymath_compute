@@ -66,11 +66,12 @@ def _get_vars(expression: "MathExpression") -> set["Variable"]:
 def plot_math_expression(  # pylint: disable=R0913
     expr: "MathExpression",
     *,
+    plot_color: str = "black",
     store_as_pdf: bool = False,
-    vars_limit: Optional[dict["Variable", VarsLimit]] = None,
     figsize: tuple[int, int] = (10, 6),
-    xlabel: str = "Variable values",
-    ylabel: str = "Expression values"
+    title: str = "",
+    xlabel: str = "Variables",
+    ylabel: str = "Variable values"
 ) -> None:
     """Plots a mathematical expression with specified limits for
     the variables and optional parameters for customization.
@@ -91,55 +92,26 @@ def plot_math_expression(  # pylint: disable=R0913
     )
 
     variables: set["Variable"] = _get_vars(expression=expr)
-    vars_limit = vars_limit if vars_limit else {}
     # From each of the variable, get a linspace
+    expr_values: list[int | float] = []
     for var in variables:
-        if var in vars_limit:
-            if "lower_limit" not in vars_limit[var]:
-                vars_limit[var]["lower_limit"] = var.lower_bound
-            if "upper_limit" not in vars_limit[var]:
-                vars_limit[var]["upper_limit"] = var.upper_bound
-        else:
-            vars_limit[var] = {
-                "lower_limit": var.lower_bound,
-                "upper_limit": var.upper_bound
-            }
-    # With this limits, get the values per each variable
-    values_per_variable = {
-        var.name: np.linspace(
-            limits["lower_limit"],  # type: ignore
-            limits["upper_limit"]  # type: ignore
-        )
-        for var, limits in vars_limit.items() if limits
-    }
-    # And get the general expression value
-    expr_values: list[float] = []
-    for values in zip(*values_per_variable.values()):
-        # Get the values to evaluate in this iteration and evaluate the expression
-        # for this items
-        expr_values.append(
-            expr.evaluate(
-                dict(zip(values_per_variable.keys(), values))  # type: ignore
-            )
-        )
+        expr_values.append(var.value)
     # Then, start to plot the figure
     plt.figure(figsize=figsize)
-    # Add the lines
-    colors = ["black", "red", "gold", "blue", "green"]
-    random.shuffle(colors)
-    i: int = 0
-    for variable, values in values_per_variable.items():
-        i += 1
-        plt.plot(values, expr_values, label=variable, color=colors[i])
+    # Plot the values of each variable
+    plt.scatter(
+        list(range(1, len(expr_values) + 1)),
+        expr_values,
+        color=plot_color
+    )
     # Add the labels
     plt.xlabel(xlabel)
     plt.ylabel(ylabel)
-    plt.title(f'Graph of ${expr}$.')
-    plt.legend()
+    plt.title(title if title else f'Graph of ${expr}$.')
     # Show grid
     plt.grid(True)
     # Decide if you want to store this graph or to show it
     if store_as_pdf is False:
         plt.show()
     else:
-        plt.savefig(f'{expr}.pdf', format='pdf')
+        plt.savefig(f'expr_plot_{random.randint(0, 100)}.pdf', format='pdf')

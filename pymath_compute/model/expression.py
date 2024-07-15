@@ -106,9 +106,21 @@ class MathExpression:
         # In the end, return the result
         return result
 
-    def plot(self) -> None:
+    def plot(  # pylint: disable=R0913
+        self,
+        *,
+        plot_color: str = "black",
+        store_as_pdf: bool = False,
+        figsize: tuple[int, int] = (10, 6),
+        title: str = "",
+        xlabel: str = "Variables",
+        ylabel: str = "Variable values"
+    ) -> None:
         """Plot the Mathematical expression with the corresponding terms"""
-        plot_math_expression(self)
+        plot_math_expression(self, plot_color=plot_color,
+                             store_as_pdf=store_as_pdf, figsize=figsize,
+                             xlabel=xlabel, ylabel=ylabel, title=title
+                             )
 
     def __repr__(self) -> str:
         expression: str = "Expression: "

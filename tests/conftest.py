@@ -8,6 +8,7 @@ test_marks = [
     "variable",
     "function",
     "expression"
+    "engine.methods"
 ]
 
 

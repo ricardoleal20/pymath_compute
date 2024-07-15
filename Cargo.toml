@@ -1,0 +1,13 @@
+[package]
+name = "pymath_compute_engine"
+version = "0.1.0"
+edition = "2021"
+
+[dependencies]
+pyo3 = { version = "0.16", features = ["extension-module"] }
+
+[lib]
+crate-type = ["cdylib"]
+
+[package.metadata.maturin]
+name = "pymath_compute.engine"
