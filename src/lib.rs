@@ -1,8 +1,10 @@
 //! Library export for Python modules
 //!
 // Import the methods module here
+mod math_models;
 mod methods;
-// Import/ use methods
+use crate::math_models::Variable;
+// Import methods
 use methods::training::*;
 use pyo3::prelude::*;
 
@@ -23,7 +25,15 @@ fn engine(py: Python, m: &PyModule) -> PyResult<()> {
     // Add all the PyModules to the main m module                        //
     // ================================================================= //
     m.add_submodule(optimization)?;
+    // Add the modules to sys
+    py.import("sys")?
+        .getattr("modules")?
+        .set_item("pymath_compute.engine.optimization_methods", optimization)?;
     // Return the result of the module at the very end                   //
+    // ================================================================= //
+    // Add all the MathModels to the main m module                       //
+    // ================================================================= //
+    m.add_class::<Variable>()?;
     Ok(())
 }
 
