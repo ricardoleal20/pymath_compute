@@ -21,12 +21,12 @@ class Variable:
         ub (int | float): The upper bound of the variable's range.
             Default to infinite
     """
-    name: str
+    _name: str
     lower_bound: float
     upper_bound: float
     _value: Optional[float]
     # Define the slots to save memory space
-    __slots__ = ["name", "lower_bound", "upper_bound", "_value"]
+    __slots__ = ["_name", "lower_bound", "upper_bound", "_value"]
 
     def __init__(
         self,
@@ -48,10 +48,20 @@ class Variable:
             raise ValueError("The lower bound should be lower than the upper bound" +
                              f" but we have LB={lb} > UP={ub}.")
         # If everything is okay, set the values
-        self.name = name
+        self._name = name
         self.lower_bound = lb
         self.upper_bound = ub
         self._value = None
+
+    @property
+    def name(self) -> str:
+        """Variable name. This is an unique identifier to found them and use
+        their value in different positions
+        
+        Returns:
+            str: The variable name
+        """
+        return self._name
 
     @property
     def value(self) -> float:
