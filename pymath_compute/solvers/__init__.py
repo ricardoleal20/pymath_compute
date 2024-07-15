@@ -8,8 +8,12 @@ The available solvers are:
     - **OptSolver**: Solver for optimization problems, such as
         the Gradient Descent method
 """
-from pymath_compute.solvers.opt_solver import OptSolver
+from pymath_compute.solvers.opt_solver import OptSolver, OptSolverConfig
 
 __all__ = [
     "OptSolver"
+]
+
+__configs__ = [
+    OptSolverConfig
 ]
