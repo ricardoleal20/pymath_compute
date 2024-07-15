@@ -6,7 +6,24 @@
 use pyo3::prelude::*;
 use pyo3::types::PyDict;
 // Module imports //
+use crate::math_utilities::derivate::compute_gradient;
 
+/// Gradient Descent implementation
+///
+/// This is a normal gradient descent implementation for a Python code.
+/// The values of the variables are updated in each iteration of the
+/// method, only if the old cost is better than the new cost.
+///
+/// Args:
+///     - variables (Vec<&PyAny>): Variables given by the PyMath Module
+///     - cost_method (PyObject): Method to calculate the cost.
+///     - var_step (float): Finite step to calculate the gradient
+///     - learning_rate (float): The learning rate for the variables
+///     - iterations (int): How many iterations are you going to run as max
+///     - tol (float): The tolerance to know if you got an optimal
+///
+/// Returns:
+///     - The status of the method
 #[pyfunction]
 pub fn gradient_descent(
     py: Python,
@@ -30,10 +47,25 @@ pub fn gradient_descent(
     let mut iter_exec: i64 = 0;
     let mut status: &str = "UNFEASIBLE";
     while iter_exec <= iterations {
-        // Get the items and their trait
+        // Get a vector of the values
+        let var_vec: Vec<f64> = var_values
+            .values()
+            .iter()
+            .map(|v| v.extract::<f64>().unwrap())
+            .collect();
+        // Get the gradient
+        let gradient = compute_gradient(var_vec.clone(), var_step)?;
         // Iterate over each value, and get the new optimized value
+        let mut var_index = 0;
         for (var_name, var_value) in var_values.items().extract::<Vec<(String, f64)>>().unwrap() {
-            var_values.set_item::<&str, f64>(&var_name, var_value - 100.0)?;
+            var_values.set_item::<&str, f64>(
+                &var_name,
+                var_value + learning_rate * gradient[var_index],
+            )?;
+            // Add one value to the var index
+            if var_index < gradient.len() - 1 {
+                var_index += 1;
+            }
         }
         // Calculate the new cost
         let cost: f64 = cost_method.call1(py, (var_values,))?.extract(py)?;
