@@ -1,5 +1,13 @@
 # Changelog
 
+## [0.3.0] - 15/07/2024
+
+### Added
+
+- [Engine]: The engine for mathematical calculations, made it on Rust
+- [OptSolver]: A Python solver written directly on Python that include an interface for easier implementation of different mathematical problems.
+- [Examples]: Some examples of how to use this package in mathematical problems.
+
 ## [0.2.0] - 09/07/2024
 
 ### Added
