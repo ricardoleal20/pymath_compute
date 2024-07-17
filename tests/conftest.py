@@ -11,7 +11,7 @@ test_marks = [
     # Solver tests
     "opt_solver",
     # Engine tests marks
-    "engine.methods"
+    "opt_methods"
 ]
 
 
