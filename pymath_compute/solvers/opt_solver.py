@@ -110,6 +110,11 @@ class OptSolver:
         Args:
             - solver_config (OptSolverConfig): Include the configuration of the solver.
         """
+        if not isinstance(solver_config, dict):
+            raise TypeError("The configuration it should be a dictionary.")
+        if not "solver_method" in solver_config:
+            raise TypeError(
+                "The solver configuration should incluye the Solver Method")
         if not isinstance(solver_config["solver_method"], OptMethods):
             raise TypeError(
                 "The solver_config` is not an enum of type `OptMethods`. " +
@@ -130,6 +135,8 @@ class OptSolver:
             - function (Callable[[list[Variable]], int | float]): Function to calculate
                 the objective functions to minimize.
         """
+        if not callable(function):
+            raise TypeError("The Objective Function is not a callable.")
         self._objective = function
 
     def solve(self) -> None:

@@ -7,7 +7,10 @@ import pytest
 test_marks = [
     "variable",
     "function",
-    "expression"
+    "expression",
+    # Solver tests
+    "opt_solver",
+    # Engine tests marks
     "engine.methods"
 ]
 
