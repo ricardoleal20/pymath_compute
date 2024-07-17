@@ -76,11 +76,12 @@ def test_set_invalid_value():
     """Test setting an invalid value to a Variable.
 
     This test checks that setting a value outside the defined
-    bounds raises a ValueError.
+    bounds would set the closes bound as the value
     """
     var: Variable = variable_to_test
-    with pytest.raises(ValueError):
-        var.value = 15.0
+    var.value = 15.0
+    # Evaluate it and confirm that it has, indeed, the upper bound as limit
+    assert var.value == var.upper_bound
 
 
 @pytest.mark.variable

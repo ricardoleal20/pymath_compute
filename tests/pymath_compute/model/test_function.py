@@ -47,7 +47,7 @@ def test_repr_math_function():
     of the MathFunction instance.
     """
     math_func = func_to_test
-    expected_repr = "sin(x)"
+    expected_repr = "sin(x: 0)"
     assert repr(math_func) == expected_repr
 
 

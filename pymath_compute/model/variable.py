@@ -83,25 +83,26 @@ class Variable:
         return self._value if self._value else 0.0
 
     @value.setter
-    def value(self, new_value: float) -> None:
+    def value(self, new_value: float) -> int | float:
         """Set a new value for this variable:
 
         Args:
             - new_value (float): New value to set
 
-        Raises:
-            ValueError: If the value set is not in the defined
-                    [lower_bound, upper_bound] range.
+        Note:
+            If the value set is not in the defined
+            [lower_bound, upper_bound] range, it would
+            take the closes bound as the value.
         """
         # Evaluate if the value is inside the range
-        if self.lower_bound <= new_value <= self.upper_bound:
+        if self.lower_bound >= new_value:
+            self._value = self.lower_bound
+        elif self.upper_bound <= new_value:
+            self._value = self.upper_bound
+        else:
+            # Set the value
             self._value = new_value
-            return
-        # If not, raise an error
-        raise ValueError(
-            f"The new expected value {new_value} is outside the range of" +
-            f" [{self.lower_bound}, {self.upper_bound}]."
-        )
+        return self._value
 
     def to_expression(self) -> 'MathExpression':
         """Convert this Variable into a MathExpression"""
