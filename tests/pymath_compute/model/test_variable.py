@@ -7,7 +7,7 @@ from pymath_compute.model.expression import MathExpression
 
 
 # Create a variable as global
-variable_to_test: Variable = Variable(name="x", lower_bound=0, upper_bound=10)
+variable_to_test: Variable = Variable(name="x", lb=0, ub=10)
 
 
 @pytest.mark.variable

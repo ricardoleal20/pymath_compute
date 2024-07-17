@@ -9,7 +9,7 @@ from pymath_compute.model.variable import Variable
 from pymath_compute.model.expression import MathExpression
 
 # Generate a global math function
-x = Variable(name="x", lower_bound=0, upper_bound=10)
+x = Variable(name="x", lb=0, ub=10)
 func_to_test = MathFunction(np.sin, x)
 
 
@@ -20,7 +20,7 @@ def test_create_math_function():
     This test checks that a MathFunction instance is created correctly
     with the expected function and variable.
     """
-    variable = Variable(name="x", lower_bound=0, upper_bound=10)
+    variable = Variable(name="x", lb=0, ub=10)
     math_func = MathFunction(np.sin, variable)
     assert math_func.function == np.sin
     assert math_func.variable == variable
@@ -59,7 +59,7 @@ def test_add_method_math_function():
     a new MathExpression when adding another MathFunction.
     """
     math_func1 = func_to_test
-    variable = Variable(name="y", lower_bound=-5, upper_bound=5)
+    variable = Variable(name="y", lb=-5, ub=5)
     math_func2 = MathFunction(np.cos, variable)
     new_expr = math_func1 + math_func2
     assert isinstance(new_expr, MathExpression)
@@ -85,7 +85,7 @@ def test_add_method_variable():
     a new MathExpression when adding a Variable instance.
     """
     math_func = func_to_test
-    variable = Variable(name="y", lower_bound=-5, upper_bound=5)
+    variable = Variable(name="y", lb=-5, ub=5)
     new_expr = math_func + variable
     assert isinstance(new_expr, MathExpression)
 
