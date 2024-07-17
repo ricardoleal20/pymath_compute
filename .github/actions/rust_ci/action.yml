@@ -20,4 +20,4 @@ runs:
 
     - name: Check Rust code 🩺
       shell: bash
-      run: cargo check
+      run: cargo check --release

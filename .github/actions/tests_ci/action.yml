@@ -22,7 +22,7 @@ runs:
       run: |
         pip install poetry
         poetry install
-        poetry run maturin build --release
+        poetry run maturin develop --release
 
     - name: Run tests 🧪
       shell: bash
