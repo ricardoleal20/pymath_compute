@@ -77,32 +77,30 @@ pub fn gradient_descent(
         if (best_cost - cost).abs() < tol {
             status = "OPTIMAL";
             break;
-        } else {
-            if cost < best_cost {
-                let mut recalculate_cost: bool = false;
-                for variable in &variables {
-                    let name: &str = variable.getattr("name")?.extract()?;
-                    let new_value: f64 = var_values.get_item(name).unwrap().extract()?;
-                    // Use the setter method to set the new value
-                    variable.setattr("value", new_value)?;
-                    // Get the value
-                    let var_value: f64 = variable.getattr("value")?.extract()?;
-                    if var_value != new_value {
-                        var_values
-                            .set_item::<&str, f64>(name, variable.getattr("value")?.extract()?)?;
-                        // Ask to recalculate the cost
-                        recalculate_cost = true
-                    }
+        } else if cost < best_cost {
+            let mut recalculate_cost: bool = false;
+            for variable in &variables {
+                let name: &str = variable.getattr("name")?.extract()?;
+                let new_value: f64 = var_values.get_item(name).unwrap().extract()?;
+                // Use the setter method to set the new value
+                variable.setattr("value", new_value)?;
+                // Get the value
+                let var_value: f64 = variable.getattr("value")?.extract()?;
+                if var_value != new_value {
+                    var_values
+                        .set_item::<&str, f64>(name, variable.getattr("value")?.extract()?)?;
+                    // Ask to recalculate the cost
+                    recalculate_cost = true
                 }
-                if recalculate_cost == true {
-                    // Recalculate the cost, in case that we have changed the variables
-                    best_cost = cost_method.call1(py, (var_values,))?.extract(py)?;
-                } else {
-                    best_cost = cost;
-                }
-                // Change the status to FEASIBLE
-                status = "FEASIBLE";
             }
+            if recalculate_cost {
+                // Recalculate the cost, in case that we have changed the variables
+                best_cost = cost_method.call1(py, (var_values,))?.extract(py)?;
+            } else {
+                best_cost = cost;
+            }
+            // Change the status to FEASIBLE
+            status = "FEASIBLE";
         }
         // Add one iteration at the end
         iter_exec += 1;
