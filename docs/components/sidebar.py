@@ -8,8 +8,7 @@ import reflex as rx
 from docs import styles
 
 # Add a dictionary for the SECTIONS
-SIDEBAR_SECTIONS: dict[str, Callable[..., rx.Component]] = {}
-
+SIDEBAR_SECTIONS: dict[int, dict] = {}
 
 def sidebar(route: str) -> rx.Component:
     """The sidebar.
@@ -27,7 +26,6 @@ def sidebar(route: str) -> rx.Component:
         ),
         display=["none", "none", "block"],
         position="sticky",
-        min_width=styles.SIDEBAR_WIDTH,
         height="100%",
         top="0px",
         border_right=styles.border,
@@ -36,7 +34,6 @@ def sidebar(route: str) -> rx.Component:
 # =============================================== #
 #                  Sidebar Views                  #
 # =============================================== #
-
 
 def __sidebar_desktop_view(route: str) -> rx.Component:
     """Desktop view of the Sidebar"""
@@ -61,6 +58,7 @@ def __sidebar_desktop_view(route: str) -> rx.Component:
             sidebar_footer(),
             height="100dvh",
         ),
+        min_width=styles.SIDEBAR_WIDTH
     )
 
 
@@ -155,7 +153,8 @@ def __sidebar_mobile_and_tablet_view(route: str) -> rx.Component:
             ),
             direction="left",
         ),
-        width="100%"
+        width="100%",
+        min_width="0%"
     )
 
 # =============================================== #
@@ -237,17 +236,17 @@ def sidebar_item(
             ),
             bg=rx.cond(
                 active,
-                rx.color("accent", 2),
+                styles.Color.PRIMARY.value,
                 "transparent",
             ),
             border=rx.cond(
                 active,
-                f"1px solid {rx.color('accent', 6)}",
+                f"1px solid {styles.Color.BACKGROUND.value}",
                 f"1px solid {rx.color('gray', 6)}",
             ),
             color=rx.cond(
                 active,
-                styles.accent_text_color,
+                styles.Color.TEXT.value,
                 styles.text_color,
             ),
             align="center",
