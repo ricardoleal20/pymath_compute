@@ -21,3 +21,7 @@ runs:
     - name: Check Rust code 🩺
       shell: bash
       run: cargo check --release
+
+    - name: Build Rust code 🧱
+      shell: bash
+      run: cargo build --release
