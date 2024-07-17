@@ -51,7 +51,7 @@ class OptSolver:
     """
     _vars: list[Variable]
     _config: OptSolverConfig
-    _objective: Callable[[list[Variable]], int | float]
+    _objective: Callable[[dict[str, int | float]], int | float]
     _results: list[Variable]
     _status: STATUS
     # Define the slots
@@ -71,7 +71,6 @@ class OptSolver:
             "solver_time": 30
         }
         self._objective = None  # type: ignore
-        self._results = []
 
     def set_variables(self, variables: list[Variable] | Variable) -> None:
         """Set Variables to be considered in the algorithm
@@ -122,17 +121,21 @@ class OptSolver:
             )
         self._config.update(solver_config)
 
-    def set_objective_function(self, function: Callable[[list[Variable]], float]) -> None:
+    def set_objective_function(
+        self,
+        function: Callable[[dict[str, int | float]], int | float]
+    ) -> None:
         """Set the objective function.
 
         This objective function should be of the form:
             ```
-            def obj_func(vars: list[Variable]) -> int | float:
+            def obj_func(vars: dict[str, int | float]) -> int | float:
                 ...
             ```
+        where the dictionary is going to be of type {var_name: var_value}
 
         Args:
-            - function (Callable[[list[Variable]], int | float]): Function to calculate
+            - function (Callable[[dict[str, int | float]]], int | float]): Function to calculate
                 the objective functions to minimize.
         """
         if not callable(function):
@@ -168,7 +171,7 @@ class OptSolver:
         Returns:
             - Return the solution from the optimization
         """
-        return self._results
+        return self._vars
 
     @property
     def status(self) -> STATUS:
