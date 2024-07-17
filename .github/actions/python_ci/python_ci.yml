@@ -1,0 +1,14 @@
+name: Python CI 🐍
+
+# ----------------------------------- #
+#          DEFINE THE STEPS           #
+# ----------------------------------- #
+
+runs:
+  using: "composite"
+  steps:
+    - name: Checkout code 🔍
+      uses: actions/checkout@v2
+
+    - name: Python Linter 🧱
+      uses: freshbooks/pyaction@v1.4.1

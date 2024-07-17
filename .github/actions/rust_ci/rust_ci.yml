@@ -1,0 +1,22 @@
+name: Rust CI 🦀
+
+
+# ----------------------------------- #
+#          DEFINE THE STEPS           #
+# ----------------------------------- #
+
+
+runs:
+  using: "composite"
+  steps:
+    - name: Checkout code 🔍
+      uses: actions/checkout@v2
+
+    - name: Set up Rust 🦀
+      uses: actions-rs/toolchain@v1
+      with:
+        profile: minimal
+        toolchain: stable
+
+    - name: Check Rust code 🩺
+      run: cargo check
