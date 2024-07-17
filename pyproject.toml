@@ -1,10 +1,18 @@
 [tool.poetry]
 name = "pymath_compute"
-version = "0.3.0"
+version = "0.3.1"
 description = "Tool to handle mathematical operations using Variables and Mathematical Expressions."
 authors = ["ricardoleal20 <rick.leal420@gmail.com>"]
+homepage = "https://pymath.ricardoleal20.dev"
+documentation = "https://pymath.ricardoleal20.dev/docs/"
+repository = "https://github.com/ricardoleal20/pymath_compute"
 license = "MIT"
 readme = "README.md"
+keywords = ["scientific_computing", "applied_math", "optimization"]
+classifiers = [
+    "Topic :: Scientific Development :: Mathematical Optimization",
+    "Topic :: Scientific Development :: Applied Mathematics",
+]
 
 [tool.poetry.dependencies]
 python = ">=3.10, <3.13"

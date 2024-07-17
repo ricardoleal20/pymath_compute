@@ -1,5 +1,19 @@
 # Changelog
 
+## [0.3.1] - 16/07/2024
+
+### Added
+
+- [Classifiers]: Add the classifiers for the project, including homepages and more stuff
+- [Maturin]: Add information for the correct Rust/Python project be implemented
+- [Tests]: Include the Engine and the solver tests
+- [Variable]: Now, you can directly include the initial value of the variable in their definition
+- [Variable]: Now, in the setter, the value set is going to be the closes bound if the expected value is outside the bound
+
+### Fixed
+
+- [Engine]: The engine now it updates the value using the setting method `value`, instead of going directly for the `_value`.
+
 ## [0.3.0] - 15/07/2024
 
 ### Added
