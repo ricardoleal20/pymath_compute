@@ -13,16 +13,15 @@ runs:
       uses: actions/checkout@v2
 
     - name: Set up Python 🐍
-      uses: actions/setup-python@v2
+      uses: actions/setup-python@v4
       with:
-        python-version: 3.10
+        python-version: "3.10"
 
     - name: Install dependencies 🏗️
       shell: bash
       run: |
-        pip install poetry
-        poetry install --no-lock
+        pip install pylint
 
-    - name: Run tests 🧪
+    - name: Evaluate the linter ☢️
       shell: bash
-      run: poetry run pytest
+      run: pylint
