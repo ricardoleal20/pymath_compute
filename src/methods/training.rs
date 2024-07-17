@@ -60,7 +60,7 @@ pub fn gradient_descent(
         for (var_name, var_value) in var_values.items().extract::<Vec<(String, f64)>>().unwrap() {
             var_values.set_item::<&str, f64>(
                 &var_name,
-                var_value + learning_rate * gradient[var_index],
+                var_value - learning_rate * gradient[var_index],
             )?;
             // Add one value to the var index
             if var_index < gradient.len() - 1 {
@@ -79,11 +79,26 @@ pub fn gradient_descent(
             break;
         } else {
             if cost < best_cost {
-                best_cost = cost;
+                let mut recalculate_cost: bool = false;
                 for variable in &variables {
-                    let name: String = variable.getattr("name")?.extract()?;
+                    let name: &str = variable.getattr("name")?.extract()?;
                     let new_value: f64 = var_values.get_item(name).unwrap().extract()?;
-                    let _ = variable.setattr("_value", new_value);
+                    // Use the setter method to set the new value
+                    variable.setattr("value", new_value)?;
+                    // Get the value
+                    let var_value: f64 = variable.getattr("value")?.extract()?;
+                    if var_value != new_value {
+                        var_values
+                            .set_item::<&str, f64>(name, variable.getattr("value")?.extract()?)?;
+                        // Ask to recalculate the cost
+                        recalculate_cost = true
+                    }
+                }
+                if recalculate_cost == true {
+                    // Recalculate the cost, in case that we have changed the variables
+                    best_cost = cost_method.call1(py, (var_values,))?.extract(py)?;
+                } else {
+                    best_cost = cost;
                 }
                 // Change the status to FEASIBLE
                 status = "FEASIBLE";
