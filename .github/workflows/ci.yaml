@@ -16,16 +16,16 @@ jobs:
     runs-on: ubuntu-latest
     name: Run Rust CI 🦀
     steps:
-      - uses: ricardoleal20/pymath_compute/.github/actions/rust_ci@ricardo/AddSolverTests
+      - uses: ./.github/actions/rust_ci
 
   python_ci:
     runs-on: ubuntu-latest
     name: Run Python CI 🐍
     steps:
-      - uses: ricardoleal20/pymath_compute/.github/actions/python_ci@ricardo/AddSolverTests
+      - uses: ./.github/actions/python_ci
 
   tests_ci:
     runs-on: ubuntu-latest
     name: Run tests 🧪
     steps:
-      - uses: ricardoleal20/pymath_compute/.github/actions/tests_ci@ricardo/AddSolverTests
+      - uses: ./.github/actions/tests_ci
