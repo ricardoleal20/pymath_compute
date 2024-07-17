@@ -20,7 +20,7 @@ runs:
       shell: bash
       run: |
         pip install poetry
-        poetry install --no-lock
+        poetry install
 
     - name: Evaluate the linter ☢️
       shell: bash
