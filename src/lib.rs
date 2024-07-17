@@ -1,7 +1,6 @@
 //! Library export for Python modules
 //!
 // Import the methods module here
-mod math_models;
 mod math_utilities;
 mod methods;
 // Import methods

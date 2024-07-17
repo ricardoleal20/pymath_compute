@@ -7,7 +7,7 @@ from pymath_compute.model.expression import MathExpression
 
 
 # Create a variable as global
-variable_to_test: Variable = Variable(name="x", lower_bound=0, upper_bound=10)
+variable_to_test: Variable = Variable(name="x", lb=0, ub=10)
 
 
 @pytest.mark.variable
@@ -35,6 +35,29 @@ def test_create_variable_without_bounds():
     assert var.name == "x"
     assert var.lower_bound == float("-inf")
     assert var.upper_bound == float("inf")
+    # The value should be 0.0
+    assert var.value == 0.0
+
+
+@pytest.mark.variable
+def test_create_variable_with_initial_value():
+    """Test the creation of a variable with a v0, being the initial value
+    of the var
+    """
+    var: Variable = Variable("x", lb=10, v0=15)
+    # Since lb = 10, ub = inf, then it is valid that lb <= v0 <= ub
+    assert var.value == 15
+
+
+@pytest.mark.variable
+def test_create_variable_with_initial_value_out_of_bounds():
+    """Test the creation of a variable with a v0 that
+    is out of the bounds. That means, that the rule
+    lb <= v0 <= ub is violated
+    """
+    # Since lb = 10, ub = 15, then it is not valid that lb <= v0 <= ub
+    with pytest.raises(ValueError):
+        _: Variable = Variable("x", lb=10, ub=15, v0=0)
 
 @pytest.mark.variable
 def test_set_valid_value():
@@ -53,11 +76,12 @@ def test_set_invalid_value():
     """Test setting an invalid value to a Variable.
 
     This test checks that setting a value outside the defined
-    bounds raises a ValueError.
+    bounds would set the closes bound as the value
     """
     var: Variable = variable_to_test
-    with pytest.raises(ValueError):
-        var.value = 15.0
+    var.value = 15.0
+    # Evaluate it and confirm that it has, indeed, the upper bound as limit
+    assert var.value == var.upper_bound
 
 
 @pytest.mark.variable
