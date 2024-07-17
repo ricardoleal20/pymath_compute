@@ -11,5 +11,17 @@ runs:
     - name: Checkout code 🔍
       uses: actions/checkout@v2
 
-    - name: Python Linter 🧱
-      uses: freshbooks/pyaction@v1.4.1
+    - name: Set up Python 🐍
+      uses: actions/setup-python@v4
+      with:
+        python-version: "3.10"
+
+    - name: Install dependencies 🏗️
+      shell: bash
+      run: |
+        pip install poetry
+        poetry install --no-lock
+
+    - name: Evaluate the linter ☢️
+      shell: bash
+      run: poetry run pylint pymath_compute/ --rcfile pyproject.toml

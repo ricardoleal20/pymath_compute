@@ -20,8 +20,9 @@ runs:
     - name: Install dependencies 🏗️
       shell: bash
       run: |
-        pip install pylint
+        pip install poetry
+        poetry install --no-lock
 
-    - name: Evaluate the linter ☢️
+    - name: Run tests 🧪
       shell: bash
-      run: pylint
+      run: poetry run pytest
