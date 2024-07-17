@@ -20,6 +20,7 @@ class Variable:
             Default to -infinite
         ub (int | float): The upper bound of the variable's range.
             Default to infinite
+        v0 (Optional:(int | float)): The initial value of the variable
     """
     _name: str
     lower_bound: float
@@ -32,7 +33,8 @@ class Variable:
         self,
         name: str,
         lb: Bound = float("-inf"),
-        ub: Bound = float("inf")
+        ub: Bound = float("inf"),
+        v0: Optional[Bound] = None,
     ) -> None:
         # Evaluate that the parameters are correct
         if not isinstance(name, str):
@@ -47,11 +49,19 @@ class Variable:
         if lb > ub:
             raise ValueError("The lower bound should be lower than the upper bound" +
                              f" but we have LB={lb} > UP={ub}.")
+        if v0 is not None:
+            if not lb <= v0 <= ub:
+                raise ValueError(f"The initial value {v0} is not" +
+                                 " in the right bounds. It should be " +
+                                 f"LB={lb} <= V0={v0} <= UP={ub}.")
+            value = v0
+        else:
+            value = lb if lb != float("-inf") else 0.0
         # If everything is okay, set the values
         self._name = name
         self.lower_bound = lb
         self.upper_bound = ub
-        self._value = None
+        self._value = value
 
     @property
     def name(self) -> str:
