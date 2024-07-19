@@ -11,10 +11,12 @@ from docs import styles  # ! DELETE ME
 
 @sidebar_section(
     page_title="Introduction :: PyMath Docs",
-    route="/docs",
-    sidebar_title="Introduction"
+    route="/docs/",
+    sidebar_title="Introduction",
+    group="Getting Started",
+    group_icon="rocket"
 )
-def introduction() -> rx.Component:
+def introduction_guide() -> rx.Component:
     """Define the introduction to the package"""
     with open("docs/content/introduction.md", encoding="utf-8") as md_file:
         content = md_file.read()
@@ -27,11 +29,11 @@ def introduction() -> rx.Component:
         margin_bottom="2em"
     )
 
-
 @sidebar_section(
     page_title="Basic Usage :: PyMath Docs",
-    route="/docs/basic_usage",
-    sidebar_title="Basic Usage"
+    route="/docs/getting_started/basic_usage",
+    sidebar_title="Basic Usage",
+    group="Getting Started"
 )
 def basic_usage() -> rx.Component:
     """Define the introduction to the package"""
@@ -53,6 +55,6 @@ def documentation_pages() -> list[Callable[..., rx.Component]]:
     """Import and return all the documentation pages"""
     # In the folder docs/content, read all the .md files available
     return [
-        introduction,
-        basic_usage
+        introduction_guide,
+        basic_usage,
     ]

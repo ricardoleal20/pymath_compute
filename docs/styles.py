@@ -6,12 +6,13 @@ import reflex as rx
 
 class Color(Enum):
     """Include the palette of colors"""
-    PRIMARY = rx.color("orange", 7)
-    SECONDARY = "#CEF1E6"
+    PRIMARY = rx.color("teal", 5)
+    SECONDARY = rx.color("orange", 7)
     BACKGROUND = "#1E1E1E"
     BACKGROUND_CONTENT = "#F7F6F6"
     TEXT = "black"
     TEXT_SECONDARY = "white"
+    SIDEBAR_TEXT = rx.color("mauve", 11)
 
 
 class TextSizes(Enum):
@@ -98,12 +99,14 @@ overlapping_button_style = {
 markdown_style = {
     "h1": lambda text: rx.heading(text, size=TextSizes.HEADING_H1.value),
     "code": lambda text: rx.code(text, color_scheme="gray"),
-    "codeblock": lambda text, **props: rx.code_block(text, **props, margin_y="1em", margin_x="2em"),
+    "codeblock": lambda text, **props: rx.code_block(
+        code=text, **props, margin_y="1em", margin_x="2em",
+        show_line_numbers=True, copy_button=True
+    ),
     "a": lambda text, **props: rx.link(
         text,
         **props,
         font_weight="bold",
-        text_decoration="underline",
         text_decoration_color=accent_text_color,
     ),
 }

@@ -37,18 +37,35 @@ def sidebar(route: str) -> rx.Component:
 
 def __sidebar_desktop_view(route: str) -> rx.Component:
     """Desktop view of the Sidebar"""
+    # Only take those sidebar section that you need
+    stacks: list[rx.Component] = []
+    stacks_group: dict[str, list[dict]] = {}
+    sorted_sections = sorted(SIDEBAR_SECTIONS)
+    for i in sorted_sections:
+        # If it is a group, then save it for later
+        group = SIDEBAR_SECTIONS[i]["group"]
+        if group is not None:
+            if group in stacks_group:
+                stacks_group[group].append(SIDEBAR_SECTIONS[i])
+            else:
+                stacks_group[group] = [SIDEBAR_SECTIONS[i]]
+            continue
+        stacks.append(sidebar_item(
+            text=SIDEBAR_SECTIONS[i]["title"],
+            url=SIDEBAR_SECTIONS[i]["route"],
+            active=SIDEBAR_SECTIONS[i]["route"] == route
+        ))
+    # Add the groups
+    stacks += [
+        sidebar_grouper(group_name, group_elements, route)
+        for group_name, group_elements in stacks_group.items()
+    ]
+
     return rx.box(
         rx.vstack(
             sidebar_header(),
             rx.vstack(
-                *[
-                    sidebar_item(
-                        text=SIDEBAR_SECTIONS[i]["title"],
-                        url=SIDEBAR_SECTIONS[i]["route"],
-                        active=SIDEBAR_SECTIONS[i]["route"] == route
-                    )
-                    for i in sorted(SIDEBAR_SECTIONS)
-                ],
+                *stacks,
                 width="100%",
                 overflow_y="auto",
                 align_items="flex-start",
@@ -64,6 +81,35 @@ def __sidebar_desktop_view(route: str) -> rx.Component:
 
 def __sidebar_mobile_and_tablet_view(route: str) -> rx.Component:
     """Desktop view of the Sidebar"""
+    # Only take those sidebar section that you need
+    stacks: list[rx.Component] = []
+    stacks_group: dict[str, list[dict]] = {}
+    # Sort the sections
+    sorted_sections = sorted(SIDEBAR_SECTIONS)
+    for i in sorted_sections:
+        # If it is a group, then save it for later
+        group = SIDEBAR_SECTIONS[i]["group"]
+        if group is not None:
+            if group in stacks_group:
+                stacks_group[group].append(SIDEBAR_SECTIONS[i])
+            else:
+                stacks_group[group] = [SIDEBAR_SECTIONS[i]]
+            continue
+        stacks.append(sidebar_item(
+            text=SIDEBAR_SECTIONS[i]["title"],
+            url=SIDEBAR_SECTIONS[i]["route"],
+            active=SIDEBAR_SECTIONS[i]["route"] == route
+        ))
+    # Add the groups
+    for group_name, group_elements in stacks_group.items():
+        # Get the icon
+        icon = None
+        for element in group_elements:
+            if element["group_icon"]:
+                icon = element["group_icon"]
+                break
+        stacks.append(sidebar_grouper(group_name, group_elements, route, icon))
+
     return rx.vstack(
         rx.drawer.root(
             rx.hstack(
@@ -127,14 +173,7 @@ def __sidebar_mobile_and_tablet_view(route: str) -> rx.Component:
                             # Add the sidebar
                             sidebar_header(),
                             rx.vstack(
-                                *[
-                                    sidebar_item(
-                                        text=SIDEBAR_SECTIONS[i]["title"],
-                                        url=SIDEBAR_SECTIONS[i]["route"],
-                                        active=SIDEBAR_SECTIONS[i]["route"] == route
-                                    )
-                                    for i in sorted(SIDEBAR_SECTIONS)
-                                ],
+                                *stacks,
                                 width="100%",
                                 align_items="flex-start",
                                 padding="1em",
@@ -178,6 +217,7 @@ def sidebar_header() -> rx.Component:
                     rx.icon("github"),
                     color_scheme="gray",
                     variant="soft",
+                    cursor="pointer"
                 ),
                 href="https://github.com/ricardoleal20/pymath_compute",
             ),
@@ -218,7 +258,8 @@ def sidebar_footer() -> rx.Component:
 def sidebar_item(
     text: str,
     url: str,
-    active: bool
+    active: bool,
+    border: bool = False
 ) -> rx.Component:
     """Sidebar item.
 
@@ -229,6 +270,15 @@ def sidebar_item(
     Returns:
         rx.Component: The sidebar item component.
     """
+    if active:
+        border_cond = f"0.5px solid {rx.color('gray', 6)}"
+    else:
+        border_cond = rx.cond(
+            border,
+            f"1px solid {rx.color('gray', 6)}",
+            "transparent",
+        )
+
     return rx.link(
         rx.hstack(
             rx.text(
@@ -239,25 +289,85 @@ def sidebar_item(
                 styles.Color.PRIMARY.value,
                 "transparent",
             ),
-            border=rx.cond(
-                active,
-                f"1px solid {styles.Color.BACKGROUND.value}",
-                f"1px solid {rx.color('gray', 6)}",
-            ),
+            border=border_cond,
             color=rx.cond(
                 active,
-                styles.Color.TEXT.value,
+                styles.Color.TEXT_SECONDARY.value,
                 styles.text_color,
             ),
             align="center",
             border_radius=styles.BORDER_RADIUS,
             width="100%",
             padding="1em",
+            _hover={
+                "bg": styles.Color.PRIMARY,
+                "text": styles.Color.TEXT_SECONDARY
+            }
         ),
         href=url,
         width="100%",
+        underline="none"
     )
 
+
+def sidebar_grouper(
+    title: str,
+    sub_items: list[dict[str, str]],
+    route: str,
+    icon: Optional[rx.Component] = None,
+) -> rx.Component:
+    """Create a grouper for the Sidebar sections using an accordion"""
+    button_info: list[rx.Component] = []
+
+    if icon:
+        button_info.append(
+            rx.icon(icon, tag=icon, size=25, mapping_right="0.5em"))
+    button_info.append(rx.text(title, size="2"))
+    return rx.chakra.accordion(
+        rx.chakra.accordion_item(
+            rx.chakra.accordion_button(
+                rx.hstack(
+                    *button_info,
+                    rx.box(flex_grow=1,),
+                    rx.chakra.accordion_icon(),
+                    bg="transparent",
+                    # border=f"1px solid {rx.color('gray', 6)}",
+                    color=styles.Color.SIDEBAR_TEXT,
+                    align_items="center",
+                    border_radius=styles.BORDER_RADIUS,
+                    border="transparent",
+                    width="100%",
+                    _hover={
+                        "color": styles.Color.PRIMARY,
+                    }
+                )
+            ),
+            rx.chakra.accordion_panel(
+                rx.chakra.accordion(
+                    rx.flex(
+                        *[
+                            sidebar_item(
+                                text=sub_item["title"],
+                                url=sub_item["route"],
+                                active=sub_item["route"] == route,
+                                border=True,
+                            )
+                            for sub_item in sub_items
+                        ],
+                        align_items="start",
+                        direction="column",
+                    ),
+                    allow_multiple=True,
+                )
+            ),
+            width="100%",
+            align="left",
+            border="transparent",
+        ),
+        height="75%",
+        width="100%",
+        allow_multiple=True,
+    )
 
 # =============================================== #
 #               Sidebar decorators                #
@@ -268,8 +378,10 @@ def sidebar_section(  # pylint: disable=R0913
     sidebar_title: Optional[str] = None,
     description: Optional[str] = None,
     meta: Optional[list[str]] = None,
+    group: Optional[str] = None,
+    group_icon: Optional[str] = None,
     index_position: Optional[int] = None
-) -> Callable[..., rx.Component]:
+) -> Callable[..., Callable[..., rx.Component]]:
     """@sidebar_section decorator.
     
     It allow us to include extra information about the components, and include
@@ -318,7 +430,9 @@ def sidebar_section(  # pylint: disable=R0913
             position = index_position
         SIDEBAR_SECTIONS[position] = {
             "title": sidebar_title if sidebar_title else page_title,
-            "route": route
+            "route": route,
+            "group": group,
+            "group_icon": group_icon
         }
         return sidebar_page
     # Return the wrapper
