@@ -4,6 +4,9 @@
     <img src="https://github.com/ricardoleal20/pymath_compute/blob/main/assets/banner.png" width="70%" height="70%" />
 </p>
 
+[![Actions Status](https://github.com/ricardoleal20/pymath_compute/workflows/Continuous%20Integration%20Workflow%20👾/badge.svg)](https://github.com/ricardoleal20/pymath_compute/actions)
+[![PyPI](https://img.shields.io/pypi/v/pymath_compute.svg?style=flat-square)](https://pypi.org/project/pymath_compute/)
+
 **PyMathCompute** is a Python tool designed to handle mathematical variables, create and evaluate mathematical expressions, and perform various mathematical optimizations. This library is ideal for those working in applied mathematics, optimization, and related fields.
 
 ## Features
