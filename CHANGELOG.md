@@ -1,5 +1,16 @@
 # Changelog
 
+## [0.3.2] - 18/07/2024
+
+### Added:
+
+- [Documentation]: Better style for the documentation page
+- [Package Info]: Include new package information
+
+### Fixed
+
+- [Documentation]: Improve and fix some minor problems on the documentation
+
 ## [0.3.1] - 16/07/2024
 
 ### Added

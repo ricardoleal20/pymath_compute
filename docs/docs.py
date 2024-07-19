@@ -5,6 +5,7 @@ Index for my FrontEnd application
 import reflex as rx
 # Import all the pages.
 from docs.pages import index, documentation_pages
+from docs import styles
 
 
 # ========================================== #
@@ -24,7 +25,8 @@ app = rx.App(  # pylint: disable=E1102
     ],
     style={
         "font_family": "Montserrat, sans-serif",
-        "font_size": "13px"
+        "font_size": "13px",
+        "background": rx.color("black")
     }
 )
 
