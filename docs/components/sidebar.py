@@ -24,7 +24,7 @@ def sidebar(route: str) -> rx.Component:
         rx.mobile_and_tablet(
             __sidebar_mobile_and_tablet_view(route)
         ),
-        display=["none", "none", "block"],
+        # display=["none", "none", "block"],
         position="sticky",
         height="100%",
         top="0px",
@@ -75,7 +75,8 @@ def __sidebar_desktop_view(route: str) -> rx.Component:
             sidebar_footer(),
             height="100dvh",
         ),
-        min_width=styles.SIDEBAR_WIDTH
+        min_width=styles.SIDEBAR_WIDTH,
+        background=styles.Color.BACKGROUND
     )
 
 
@@ -217,7 +218,8 @@ def sidebar_header() -> rx.Component:
                     rx.icon("github"),
                     color_scheme="gray",
                     variant="soft",
-                    cursor="pointer"
+                    cursor="pointer",
+                    border_radius=styles.BORDER_RADIUS
                 ),
                 href="https://github.com/ricardoleal20/pymath_compute",
             ),

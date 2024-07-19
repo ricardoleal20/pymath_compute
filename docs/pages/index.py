@@ -5,7 +5,7 @@ import reflex as rx
 # Local imports
 from docs import __info__ as info
 from docs.components.navbar import navbar
-from docs.styles import TextSizes, border_spacer
+from docs.styles import TextSizes, border_spacer, Color
 
 
 def index() -> rx.Component:
@@ -207,4 +207,5 @@ def footer():
         border_top=border_spacer,
         width="100%",
         padding_y="3em",
+        background_color=rx.color_mode_cond(light="white", dark="#111113")
     )
