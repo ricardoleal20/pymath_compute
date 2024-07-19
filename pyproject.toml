@@ -10,8 +10,8 @@ license = "MIT"
 readme = "README.md"
 keywords = ["scientific_computing", "applied_math", "optimization"]
 classifiers = [
-    "Topic :: Scientific Development :: Mathematical Optimization",
-    "Topic :: Scientific Development :: Applied Mathematics",
+    "Topic :: Software Development :: Libraries :: Python Modules",
+    "Topic :: Scientific/Engineering :: Mathematics",
 ]
 
 [tool.poetry.dependencies]
@@ -29,28 +29,28 @@ pytest-cov = "~=5.0"
 pytest-xdist = "~=3.6.1"
 reflex = ">=0.5.5"
 
+
+[tool.pylint]
+ignore-paths = ["pymath_compute/engine/*"]
+disable = ["E0401", "E0611"]
+fail-under = 9.8
+
 [build-system]
 requires = ["maturin>=1.7.0"]
 build-backend = "maturin"
 
 [tool.maturin]
 bindings = "pyo3"
+features = ["pyo3/extension-module"]
 module-name = "pymath_compute.engine"
-description = "Tool to handle mathematical operations using Variables and Mathematical Expressions."
-authors = ["ricardoleal20 <rick.leal420@gmail.com>"]
-homepage = "https://pymath.ricardoleal20.dev"
-documentation = "https://pymath.ricardoleal20.dev/docs/"
-repository = "https://github.com/ricardoleal20/pymath_compute"
-license = "MIT"
-readme = "README.md"
-keywords = ["scientific_computing", "applied_math", "optimization"]
-classifiers = [
-    "Topic :: Scientific Development :: Mathematical Optimization",
-    "Topic :: Scientific Development :: Applied Mathematics",
-]
 
+[tool.setuptools.packages]
+# Pure Python packages/modules
+find = { where = ["python"] }
 
-[tool.pylint]
-ignore-paths = ["pymath_compute/engine/*"]
-disable = ["E0401", "E0611"]
-fail-under = 9.8
+[[tool.setuptools-rust.ext-modules]]
+# Private Rust extension module to be nested into the Python package
+target = "pymath_compute.engine" # The last part of the name (e.g. "_lib") has to match lib.name in Cargo.toml,
+# but you can add a prefix to nest it inside of a Python package.
+path = "Cargo.toml" # Default value, can be omitted
+binding = "PyO3"    # Default value, can be omitted

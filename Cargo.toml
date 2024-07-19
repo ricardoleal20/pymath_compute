@@ -11,8 +11,8 @@ license = "MIT"
 readme = "README.md"
 keywords = ["scientific_computing", "applied_math", "optimization"]
 classifiers = [
-    "Topic :: Scientific Development :: Mathematical Optimization",
-    "Topic :: Scientific Development :: Applied Mathematics",
+    "Topic :: Software Development :: Libraries :: Python Modules",
+    "Topic :: Scientific/Engineering :: Mathematics",
 ]
 
 
@@ -20,6 +20,9 @@ classifiers = [
 pyo3 = { version = "0.16", features = ["extension-module"] }
 
 [lib]
+name = "engine" # private module to be nested into Python package,
+# needs to match the name of the function with the `[#pymodule]` attribute
+path = "src/lib.rs"
 crate-type = ["cdylib"]
 
 [package.metadata.maturin]
