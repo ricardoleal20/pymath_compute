@@ -5,10 +5,11 @@ to define and create a variable with a specific range [low_bound, upper_bound]
 This variable would have a MathExpression instead of the normal
 mathematical operations.
 """
-from typing import Optional
+from typing import Optional, Union
 # Local imports
 from pymath_compute.model.types import Operators, Bound
 from pymath_compute.model.expression import MathExpression
+from pymath_compute.model.function import MathFunction
 
 
 class Variable:
@@ -21,13 +22,20 @@ class Variable:
         ub (int | float): The upper bound of the variable's range.
             Default to infinite
         v0 (Optional:(int | float)): The initial value of the variable
+        is_integer (Optional(bool)): If this variable can only take integer
+            values or if it can take also float values.
     """
     _name: str
     lower_bound: float
     upper_bound: float
     _value: Optional[float]
+    _is_integer: bool
     # Define the slots to save memory space
-    __slots__ = ["_name", "lower_bound", "upper_bound", "_value"]
+    __slots__ = [
+        "_name", "lower_bound",
+                 "upper_bound", "_value",
+                 "_is_integer"
+    ]
 
     def __init__(
         self,
@@ -35,6 +43,7 @@ class Variable:
         lb: Bound = float("-inf"),
         ub: Bound = float("inf"),
         v0: Optional[Bound] = None,
+        only_integer: bool = False
     ) -> None:
         # Evaluate that the parameters are correct
         if not isinstance(name, str):
@@ -62,6 +71,7 @@ class Variable:
         self.lower_bound = lb
         self.upper_bound = ub
         self._value = value
+        self._is_integer = only_integer
 
     @property
     def name(self) -> str:
@@ -80,7 +90,9 @@ class Variable:
         Returns:
             float: The current value of the variable.
         """
-        return self._value if self._value else 0.0
+        value = self._value if self._value else 0.0
+
+        return int(value) if self._is_integer else value
 
     @value.setter
     def value(self, new_value: float) -> int | float:
@@ -130,7 +142,7 @@ class Variable:
             return MathExpression({self: 1, other: 1})
         if isinstance(other, MathExpression):
             return other + self
-        if type(other).__name__ == "MathFunction":
+        if isinstance(other, MathFunction):
             return MathExpression({self: 1, other: 1})
         if isinstance(other, (int, float)):
             return MathExpression({self: 1, 'const': other})
@@ -149,7 +161,7 @@ class Variable:
     def __mul__(self, other: Operators) -> 'MathExpression':
         if isinstance(other, Variable):
             return MathExpression({(self, other): 1})
-        if type(other).__name__ == "MathFunction":
+        if isinstance(other, MathFunction):
             return MathExpression({self: 1, other: 1})
         if isinstance(other, (int, float)):
             return MathExpression({self: other})
@@ -189,3 +201,39 @@ class Variable:
             "For the moment, the only power values " +
             "that we have implemented are: [int]."
         )
+
+    # /////////////////////////// #
+    #     COMPARISON METHODS      #
+    # /////////////////////////// #
+
+    def __le__(self, other: Union['Variable', float, int]) -> MathFunction:
+        """Overload the <= operator"""
+        # Generate the expression
+        def less_equal_than(value: int | float) -> int:
+            return int(value <= (other.value if isinstance(other, Variable) else other))
+
+        return MathFunction(less_equal_than, self)
+
+    def __lt__(self, other: Union['Variable', float, int]) -> MathFunction:
+        """Overload the < operator"""
+        # Generate the expression
+        def less_than(value: int | float) -> int:
+            return int(value < (other.value if isinstance(other, Variable) else other))
+
+        return MathFunction(less_than, self)
+
+    def __ge__(self, other: Union['Variable', float, int]) -> MathFunction:
+        """Overload the >= operator"""
+        # Generate the expression
+        def greater_equal_than(value: int | float) -> int:
+            return int(value >= (other.value if isinstance(other, Variable) else other))
+
+        return MathFunction(greater_equal_than, self)
+
+    def __gt__(self, other: Union['Variable', float, int]) -> MathFunction:
+        """Overload the > operator"""
+        # Generate the expression
+        def greater_than(value: int | float) -> int:
+            return int(value > (other.value if isinstance(other, Variable) else other))
+
+        return MathFunction(greater_than, self)

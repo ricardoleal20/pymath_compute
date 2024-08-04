@@ -5,7 +5,7 @@ This module provides the implementation of the `MathFunction` class, which allow
 the creation and manipulation of mathematical functions involving variables. The 
 functions can be evaluated given a set of variable values.
 """
-from typing import Callable, TypeVar, Union, TYPE_CHECKING
+from typing import Callable, TypeVar, Union, Optional, TYPE_CHECKING
 from pymath_compute.model.expression import MathExpression
 if TYPE_CHECKING:
     from pymath_compute.model.variable import Variable
@@ -42,8 +42,10 @@ class MathFunction:
         self.function = function
         self.variable = variable
 
-    def evaluate(self, values: dict) -> float:
+    def evaluate(self, values: Optional[dict] = None) -> float:
         """Evaluate the mathematical function using the provided variable values.
+        If we do not provide any dictionary with values, we'll use the variable.value
+        given
 
         Args:
             values (dict): A dictionary of values using the variable names as keys
@@ -55,13 +57,18 @@ class MathFunction:
         Raises:
             ValueError: If the required variable is not included in the provided values.
         """
+        if values is None:
+            values = {}
         if isinstance(self.variable, MathExpression):
             return self.function(self.variable.evaluate(values))
-        if type(self.variable).__name__ == "Variable" and self.variable.name not in values:
-            raise ValueError(
-                f"The variable {self.variable.name} is not in the given values."
-            )
-        return self.function(values[self.variable.name])
+        if type(self.variable).__name__ == "Variable":
+            # If the variable is on values
+            if self.variable.name in values:
+                return self.function(values[self.variable.name])
+            if self.variable in values:
+                return self.function(values[self.variable])
+
+        return self.function(self.variable.value)
 
     def to_expression(self) -> 'MathExpression':
         """Convert this Function into a MathExpression"""

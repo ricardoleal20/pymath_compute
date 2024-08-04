@@ -36,7 +36,7 @@ def _generate_terms(
 
 def _evaluate(
     items: Sequence,
-    values: dict[str, int | float]
+    values: dict[str | object, int | float]
 ) -> float:
     """Evaluate elements in a iterative way"""
     # Define the term
@@ -44,7 +44,10 @@ def _evaluate(
     # Iterate over the items
     for item in items:
         if type(item).__name__ == "Variable":
-            term *= values[item.name]
+            if item in values:
+                term *= values[item.name]
+            else:
+                term *= item.value
         elif type(item).__name__ == "MathFunction":
             term *= item.evaluate(values)  # type: ignore
         elif isinstance(item, MathExpression):
@@ -66,7 +69,7 @@ class MathExpression:
     def __init__(self, terms: MathematicalTerms) -> None:
         self.terms = terms
 
-    def evaluate(self, values: dict[str, int | float]) -> float:
+    def evaluate(self, values: Optional[dict[str | object, int | float]] = None) -> float:
         """From a passed dictionary of values, we'll evaluate the current terms
         expression with that value.
 
@@ -81,9 +84,11 @@ class MathExpression:
             values: dict[str, int | float]: A dict of values using the variable name as key
                 and the value to set as the corresponding item for that key
         """
-        if not isinstance(values, dict):
+        if values is not None and not isinstance(values, dict):
             raise TypeError("We're expecting a dict as {VAR_NAME: MATH_VALUE}," +
                             f" but instead we got {type(values)}.")
+        if values is None:
+            values = {}
         # Initialize the result variable
         result: float = 0.0
         for var, coef in self.terms.items():
@@ -93,11 +98,9 @@ class MathExpression:
                 result += coef
             elif type(var).__name__ == "Variable":
                 if var.name not in values:  # type: ignore
-                    raise ValueError(
-                        "In the given values, we're missing the" +
-                        f" following variable '{var.name}'."  # type: ignore
-                    )
-                result += coef*values[var.name]  # type: ignore
+                    result += coef*var.value  # type: ignore
+                else:
+                    result += coef*values[var.name]  # type: ignore
             elif type(var).__name__ == "MathFunction":
                 result += coef * var.evaluate(values)  # type: ignore
             else:
