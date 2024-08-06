@@ -237,3 +237,25 @@ class Variable:
             return int(value > (other.value if isinstance(other, Variable) else other))
 
         return MathFunction(greater_than, self)
+
+    def __eq__(self, other: Union["Variable", "MathFunction", float, int]) -> MathFunction:
+        """Overload the == operator"""
+        def equal_to(value: int | float) -> int:
+            if isinstance(other, Variable):
+                return int(value == other.value)
+            if isinstance(other, MathFunction):
+                return int(value == other.evaluate())
+            if isinstance(other, MathExpression):
+                return int(value == other.evaluate())
+            if isinstance(other, (float, int)):
+                return int(value == other)
+            # If it is not
+            return 0
+
+        return MathFunction(equal_to, self)
+
+    # /////////////////////////// #
+    #        HASH METHODS         #
+    # /////////////////////////// #
+    def __hash__(self) -> int:
+        return hash((self._name, self.lower_bound, self.upper_bound, self._value, self._is_integer))

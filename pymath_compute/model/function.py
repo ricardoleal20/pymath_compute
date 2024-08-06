@@ -37,7 +37,7 @@ class MathFunction:
     def __init__(
         self,
         function: Callable[..., FunctionReturn],
-        variable: Union['Variable', MathExpression]
+        variable: Union['Variable', MathExpression, "MathFunction"]
     ) -> None:
         self.function = function
         self.variable = variable
@@ -59,7 +59,7 @@ class MathFunction:
         """
         if values is None:
             values = {}
-        if isinstance(self.variable, MathExpression):
+        if isinstance(self.variable, (MathExpression, MathFunction)):
             return self.function(self.variable.evaluate(values))
         if type(self.variable).__name__ == "Variable":
             # If the variable is on values
@@ -79,7 +79,7 @@ class MathFunction:
         self.to_expression().plot()
 
     def __repr__(self) -> str:
-        return f"{self.function.__name__}({self.variable})"
+        return f"Function[{self.function.__name__}({self.variable})]"
 
     # ============================================= #
     #      MATH OPERATIONS REPLACING SECTION        #
@@ -102,3 +102,28 @@ class MathFunction:
 
     def __radd__(self, other):
         return self.__add__(other)
+
+    # /////////////////////////// #
+    #     COMPARISON METHODS      #
+    # /////////////////////////// #
+
+    def __eq__(self, other: Union["Variable", "MathFunction", float, int]) -> "MathFunction":
+        """Overload the == operator"""
+        def equal_to(value: int | float) -> int:
+            if type(other).__name__ == "Variable":
+                return int(value == other.value)  # type: ignore
+            if isinstance(other, MathFunction):
+                return int(value == other.evaluate())
+            if isinstance(other, MathExpression):
+                return int(value == other.evaluate())
+            if isinstance(other, (float, int)):
+                return int(value == other)
+            # If it is not
+            return 0
+        return MathFunction(equal_to, self)
+
+    # /////////////////////////// #
+    #        HASH METHODS         #
+    # /////////////////////////// #
+    def __hash__(self) -> int:
+        return hash((id(self), id(self.variable), id(self.function)))

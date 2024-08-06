@@ -5,11 +5,14 @@ This module provides the implementation of the `MathExpression` class, which all
 the creation and manipulation of mathematical expressions involving variables, constants,
 and functions. The expressions can be evaluated given a set of variable values.
 """
-from typing import Sequence, Optional
+from typing import Sequence, Optional, Union, TYPE_CHECKING
 # Local import
 from pymath_compute.model.types import Operators, MathematicalTerms
 from pymath_compute.utils.graph import plot_math_expression
 
+if TYPE_CHECKING:
+    from pymath_compute.model.variable import Variable
+    from pymath_compute.model.function import MathFunction
 
 def _generate_terms(
     items: Sequence,
@@ -283,3 +286,30 @@ class MathExpression:
             new_expr = self * self
         # Return it
         return new_expr
+
+    # /////////////////////////// #
+    #     COMPARISON METHODS      #
+    # /////////////////////////// #
+
+    def __eq__(self, other: Union["Variable", "MathFunction", float, int]) -> "MathFunction":
+        """Overload the == operator"""
+        from pymath_compute.model.function import MathFunction  # pylint: disable=C0415
+
+        def equal_to(value: int | float) -> int:
+            if type(other).__name__ == "Variable":
+                return int(value == other.value)  # type: ignore
+            if type(other).__name__ == "MathFunction":
+                return int(value == other.evaluate())  # type: ignore
+            if isinstance(other, MathExpression):
+                return int(value == other.evaluate())
+            if isinstance(other, (float, int)):
+                return int(value == other)
+            # If it is not
+            return False
+        return MathFunction(equal_to, self)
+
+    # /////////////////////////// #
+    #        HASH METHODS         #
+    # /////////////////////////// #
+    def __hash__(self) -> int:
+        return hash((id(self), id(self.terms)))
