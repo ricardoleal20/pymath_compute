@@ -2,11 +2,17 @@
 Different utilities, such as a Gradient calculator
 and other minor extra methods
 """
+import sys
 import math
 # External imports
 import numpy as np
 # Local imports
 from pymath_compute.model import MathExpression, MathFunction, Variable
+
+
+def get_max_int() -> int:
+    """Returns the maximum integer value that can be processed by the system."""
+    return sys.maxsize
 
 available_methods_to_derivative = {
     np.sin: np.cos,
