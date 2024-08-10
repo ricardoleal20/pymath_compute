@@ -11,13 +11,54 @@ Classes:
 """
 import asyncio
 import time
-from typing import Literal, Callable, TypedDict, Awaitable
+from functools import partial
+from typing import (
+    Literal, Callable, TypedDict,
+    Awaitable, Optional, Any
+)
 # Local imports
 from pymath_compute.methods import OptMethods
-from pymath_compute.model.variable import Variable
+from pymath_compute.model.variable import Variable, MathExpression, MathFunction
+from pymath_compute.utils.math_utils import get_max_int
 
 STATUS = Literal["OPTIMAL", "FEASIBLE", "UNFEASIBLE", "NOT_EXECUTED"]
+MAX_INT = get_max_int()
 
+
+class Constraint:
+    """Constraint for the Optimization problem modeled"""
+    _expression: MathExpression | MathFunction
+    _weight: int | float
+    __slots__ = ["_expression", "_weight"]
+
+    def __init__(self, expression: MathExpression | MathFunction, weight: int | float) -> None:
+        self._expression = expression
+        self._weight = weight
+
+    def __call__(self, values: Optional[dict] = None) -> int | float:
+        const_val = self.value()
+        if const_val == MAX_INT:
+            return float("inf")
+        return const_val
+
+    def value(self, values: Optional[dict] = None) -> int | float:
+        """Get the value of the constraint.
+        
+        If you constraint is a hard constraint (meaning, that it's weight
+        is infinite or that is a == expression, ...)
+        """
+        return self._weight * self._expression.evaluate(values)
+
+    def is_satisfied(self, values: Optional[dict] = None) -> int:
+        """Evaluate if the math expression is validated"""
+        const_val = int(self._expression.evaluate(values))
+
+        if const_val == MAX_INT:
+            return 0
+        return 1
+
+    def __repr__(self) -> str:
+        return f"CONSTRAINT::{self._weight}*{self._expression}"
 
 class _Config(TypedDict):
     """Internal configuration for the solver"""
@@ -29,6 +70,8 @@ class OptSolverConfig(_Config, total=False):
     """Solver input configuration dictionary, that allow the user
     to implement easily the configuration for the solver Config
     """
+    solver_time: int
+    solver_method: OptMethods
     finite_var_step: float
     iterations: int
     tol: float
@@ -50,13 +93,15 @@ class OptSolver:
         vars_results: Returns the solution variables from the optimization.
     """
     _vars: list[Variable]
-    _config: OptSolverConfig
+    _constraints: list[Constraint]
+    _config: _Config
     _objective: Callable[[dict[str, int | float]], int | float]
     _results: list[Variable]
     _status: STATUS
     # Define the slots
     __slots__ = [
         "_vars",
+        "_constraints",
         "_config",
         "_objective",
         "_results",
@@ -67,10 +112,63 @@ class OptSolver:
         # Init the parameters
         self._status = "NOT_EXECUTED"
         self._vars = []
+        self._constraints = []
         self._config = {  # type: ignore
             "solver_time": 30
         }
         self._objective = None  # type: ignore
+
+    def __add_variable(self, **params) -> Variable:
+        """Generic method to create variable"""
+        var = Variable(**params)
+        self._vars.append(var)
+        return var
+
+    def add_variable(self, name: str, lb: int | float, ub: int | float) -> Variable:
+        """Create and add a variable to the model
+        
+        Args:
+            - name: Unique identifier for the variable
+            - lb: Lower bound of the variable
+            - ub: Upper bound of the variable
+        """
+        return self.__add_variable(name=name, lb=lb, ub=ub)
+
+    def add_int_variable(self, name: str, lb: int | float, ub: int | float) -> Variable:
+        """Create and add an integer variable to the model
+        
+        Args:
+            - name: Unique identifier for the variable
+            - lb: Lower bound of the variable
+            - ub: Upper bound of the variable
+        """
+        return self.__add_variable(name=name, lb=lb, ub=ub, only_integer=True)
+
+    def add_bool_variable(self, name: str) -> Variable:
+        """Create and add a boolean variable to the model
+        
+        Args:
+            - name: Unique identifier for the variable
+        """
+        return self.__add_variable(name=name, lb=0, ub=1, only_integer=True)
+
+    def add_constraint(
+        self,
+        expression: MathExpression | MathFunction,
+        weight: int | float = 1
+    ) -> Constraint:
+        """Add a constraints for the solver. This constraint allow us
+        to define limits on the solution
+        
+        Args:
+            - Expression: Can be a MathExpression or a MathFunction
+            - weight (optional[int]): Is the weight of the solution. This means
+                how much it does care to the algorithm to minimize it or maximize it
+        """
+        constraint = Constraint(expression, weight)
+        self._constraints.append(constraint)
+        return constraint
+
 
     def set_variables(self, variables: list[Variable] | Variable) -> None:
         """Set Variables to be considered in the algorithm
@@ -123,7 +221,8 @@ class OptSolver:
 
     def set_objective_function(
         self,
-        function: Callable[[dict[str, int | float]], int | float]
+        function: Callable[[dict[str, int | float]], int | float],
+        **kwargs: Any
     ) -> None:
         """Set the objective function.
 
@@ -140,7 +239,7 @@ class OptSolver:
         """
         if not callable(function):
             raise TypeError("The Objective Function is not a callable.")
-        self._objective = function
+        self._objective = partial(function, **kwargs)
 
     def solve(self) -> None:
         """Solves the optimization problem.
@@ -198,7 +297,8 @@ class OptSolver:
             )
         except TimeoutError:
             self._status = "FEASIBLE"
-        except Exception:  # pylint: disable=W0718
+        except Exception as e:  # pylint: disable=W0718
+            print("Error executing the algorithm:", e)
             self._status = "UNFEASIBLE"
         print(
             f"Solver ending with status {self._status}" +
@@ -218,6 +318,7 @@ class OptSolver:
         inputs = {
             "variables": self._vars,
             "cost_method": self._objective,
+            "constraints": self._constraints
         }
         for key, config in self._config.items():
             if key not in ["solver_method", "solver_time"]:

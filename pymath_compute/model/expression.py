@@ -48,6 +48,8 @@ def _evaluate(
     for item in items:
         if type(item).__name__ == "Variable":
             if item in values:
+                term *= values[item]
+            elif item.name in values:
                 term *= values[item.name]
             else:
                 term *= item.value
@@ -72,7 +74,10 @@ class MathExpression:
     def __init__(self, terms: MathematicalTerms) -> None:
         self.terms = terms
 
-    def evaluate(self, values: Optional[dict[str | object, int | float]] = None) -> float:
+    def evaluate(self, values: Optional[
+        dict[str, int | float] |
+        dict["Variable", int | float]
+    ] = None) -> float:
         """From a passed dictionary of values, we'll evaluate the current terms
         expression with that value.
 
@@ -97,13 +102,15 @@ class MathExpression:
         for var, coef in self.terms.items():
             # If the var is a constant, don't do
             # anything but adding them to the result
-            if var == "const" and isinstance(var, str):
+            if isinstance(var, str) and var == "const":
                 result += coef
             elif type(var).__name__ == "Variable":
-                if var.name not in values:  # type: ignore
-                    result += coef*var.value  # type: ignore
-                else:
+                if var.name in values:  # type: ignore
                     result += coef*values[var.name]  # type: ignore
+                elif var in values:  # type: ignore
+                    result += coef*values[var]  # type: ignore
+                else:
+                    result += coef*var.value  # type: ignore
             elif type(var).__name__ == "MathFunction":
                 result += coef * var.evaluate(values)  # type: ignore
             else:
@@ -133,7 +140,7 @@ class MathExpression:
         # Add the terms to print in the representation
         printable_terms: list[str] = []
         for var, coef in self.terms.items():
-            if var == "const":
+            if isinstance(var, str) and var == "const":
                 printable_terms.append(str(coef))
             elif type(var).__name__ == "Variable":
                 printable_terms.append(f"{coef}*{var.name}")  # type: ignore
@@ -239,11 +246,6 @@ class MathExpression:
     # ////////////////////////// #
 
     def __sub__(self, other: Operators) -> 'MathExpression':
-        print(
-            type(other).__name__,
-            type(other).__name__ in ["Variable", "MathFunction"],
-            type(other).__name__ == "Variable"
-        )
         # Evaluate that the other parameter is a valid expression
         if not isinstance(other, (int, float, MathExpression)) \
                 and not type(other).__name__ in ["Variable", "MathFunction"]:
@@ -294,18 +296,26 @@ class MathExpression:
     def __eq__(self, other: Union["Variable", "MathFunction", float, int]) -> "MathFunction":
         """Overload the == operator"""
         from pymath_compute.model.function import MathFunction  # pylint: disable=C0415
+        from pymath_compute.utils.math_utils import get_max_int  # pylint: disable=C0415
+
+        max_int = get_max_int()
 
         def equal_to(value: int | float) -> int:
             if type(other).__name__ == "Variable":
-                return int(value == other.value)  # type: ignore
+                return max_int*(1-int(value == other.value))  # type: ignore
             if type(other).__name__ == "MathFunction":
-                return int(value == other.evaluate())  # type: ignore
+                return max_int*(
+                    1-int(value == other.evaluate()))  # type: ignore
             if isinstance(other, MathExpression):
-                return int(value == other.evaluate())
+                return max_int*(1-int(value == other.evaluate()))
             if isinstance(other, (float, int)):
-                return int(value == other)
+                return max_int*(1-int(value == other))
             # If it is not
-            return False
+            raise NotImplementedError(
+                f"The equal to between {self} and {other}" +
+                f" of type {type(other)} is not implemented"
+            )
+
         return MathFunction(equal_to, self)
 
     # /////////////////////////// #

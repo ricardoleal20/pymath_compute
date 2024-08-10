@@ -240,17 +240,23 @@ class Variable:
 
     def __eq__(self, other: Union["Variable", "MathFunction", float, int]) -> MathFunction:
         """Overload the == operator"""
+        from pymath_compute.utils.math_utils import get_max_int  # pylint: disable=C0415
+        max_int = get_max_int()
+
         def equal_to(value: int | float) -> int:
             if isinstance(other, Variable):
-                return int(value == other.value)
+                return max_int*(1-int(value == other.value))
             if isinstance(other, MathFunction):
-                return int(value == other.evaluate())
+                return max_int*(1-int(value == other.evaluate()))
             if isinstance(other, MathExpression):
-                return int(value == other.evaluate())
+                return max_int*(1-int(value == other.evaluate()))
             if isinstance(other, (float, int)):
-                return int(value == other)
-            # If it is not
-            return 0
+                return max_int*(1-int(value == other))
+            # If it is not, raise an error
+            raise NotImplementedError(
+                f"The equal to between {self} and {other}" +
+                f" of type {type(other)} is not implemented"
+            )
 
         return MathFunction(equal_to, self)
 
@@ -258,4 +264,4 @@ class Variable:
     #        HASH METHODS         #
     # /////////////////////////// #
     def __hash__(self) -> int:
-        return hash((self._name, self.lower_bound, self.upper_bound, self._value, self._is_integer))
+        return hash((self._name, self.lower_bound, self.upper_bound, self._is_integer))
