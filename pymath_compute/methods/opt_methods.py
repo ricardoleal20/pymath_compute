@@ -1,18 +1,24 @@
 """
 Optimization methods for the solvers
 """
-from typing import Callable, Literal
+from typing import Callable, Literal, TYPE_CHECKING
 from enum import Enum
 from functools import partial
 # Local imports
 from pymath_compute.model import Variable
-from pymath_compute.engine.optimization_methods import gradient_descent
+from pymath_compute.engine.optimization_methods import (  # type: ignore
+    gradient_descent, held_karp, brute_force  # type: ignore
+)
+
+if TYPE_CHECKING:
+    from pymath_compute.solvers.opt_solver import Constraint
 
 STATUS = Literal["OPTIMAL", "FEASIBLE", "UNFEASIBLE", "NOT_EXECUTED"]
 
 
 async def _gradient_descent(  # pylint: disable=R0913
     variables: list[Variable],
+    constraints: list["Constraint"],
     cost_method: Callable[[dict[str, float]], float],
     *,
     finite_var_step: float = 0.001,
@@ -42,6 +48,9 @@ async def _gradient_descent(  # pylint: disable=R0913
             "This gradient method only works for more than 1 variable." +
             "Try making your solution space more finite."
         )
+    if constraints:
+        raise NotImplementedError(
+            "The `Gradient Descent` method doesn't have compatibility with constraints.")
     # Just call the gradient descent method from the engine
     return gradient_descent(
         variables,
@@ -51,6 +60,24 @@ async def _gradient_descent(  # pylint: disable=R0913
         iterations,
         tol
     )
+
+
+async def _held_karp(
+    variables: list[Variable],
+    constraints: list["Constraint"],
+    objective: Variable,
+) -> STATUS:
+    """Implementation of the Rust method Held Karp"""
+    return held_karp(variables, constraints, objective)
+
+
+async def _brute_force(
+    variables: list[Variable],
+    constraints: list["Constraint"],
+    objective: Variable,
+) -> STATUS:
+    """Implementation of the Rust method Brute Force"""
+    return brute_force(variables, constraints, objective)
 
 # ===================== #
 # Define the ENUM class #
@@ -62,5 +89,9 @@ class OptMethods(Enum):
     
     Available methods are:
         * GRADIENT_DESCENT
+        * HELD_KARP
+        * BRUTE_FORCE
     """
     GRADIENT_DESCENT = partial(_gradient_descent)
+    HELD_KARP = partial(_held_karp)
+    BRUTE_FORCE = partial(_brute_force)
