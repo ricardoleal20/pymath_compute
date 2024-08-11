@@ -7,7 +7,7 @@ mod model;
 // Import methods
 use math_utilities::*;
 use methods::*;
-use model::EngineVar;
+use model::{Constraint, EngineVar};
 use pyo3::prelude::*;
 
 /// Mathematical engine for all heavy mathematical computations
@@ -93,6 +93,7 @@ fn build_models_module(py: Python) -> Result<&PyModule, PyErr> {
     let models_module = PyModule::new(py, "model")?;
     // Add the methods inside here
     models_module.add_class::<EngineVar>()?;
+    models_module.add_class::<Constraint>()?;
     // Return the methods module
     Ok(models_module)
 }

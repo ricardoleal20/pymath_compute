@@ -14,51 +14,19 @@ import time
 from functools import partial
 from typing import (
     Literal, Callable, TypedDict,
-    Awaitable, Optional, Any
+    Awaitable, Any, Union,
+    overload
 )
 # Local imports
 from pymath_compute.methods import OptMethods
 from pymath_compute.model.variable import Variable, MathExpression, MathFunction
 from pymath_compute.utils.math_utils import get_max_int
+# Import the rust constraint
+from pymath_compute.engine.model import Constraint  # type: ignore
 
 STATUS = Literal["OPTIMAL", "FEASIBLE", "UNFEASIBLE", "NOT_EXECUTED"]
 MAX_INT = get_max_int()
 
-
-class Constraint:
-    """Constraint for the Optimization problem modeled"""
-    _expression: MathExpression | MathFunction
-    _weight: int | float
-    __slots__ = ["_expression", "_weight"]
-
-    def __init__(self, expression: MathExpression | MathFunction, weight: int | float) -> None:
-        self._expression = expression
-        self._weight = weight
-
-    def __call__(self, values: Optional[dict] = None) -> int | float:
-        const_val = self.value()
-        if const_val == MAX_INT:
-            return float("inf")
-        return const_val
-
-    def value(self, values: Optional[dict] = None) -> int | float:
-        """Get the value of the constraint.
-        
-        If you constraint is a hard constraint (meaning, that it's weight
-        is infinite or that is a == expression, ...)
-        """
-        return self._weight * self._expression.evaluate(values)
-
-    def is_satisfied(self, values: Optional[dict] = None) -> int:
-        """Evaluate if the math expression is validated"""
-        const_val = int(self._expression.evaluate(values))
-
-        if const_val == MAX_INT:
-            return 0
-        return 1
-
-    def __repr__(self) -> str:
-        return f"CONSTRAINT::{self._weight}*{self._expression}"
 
 class _Config(TypedDict):
     """Internal configuration for the solver"""
@@ -219,12 +187,31 @@ class OptSolver:
             )
         self._config.update(solver_config)
 
+    @overload
     def set_objective_function(
         self,
         function: Callable[[dict[str, int | float]], int | float],
         **kwargs: Any
     ) -> None:
-        """Set the objective function.
+        ...
+
+    @overload
+    def set_objective_function(
+        self,
+        function: MathExpression | MathFunction
+    ) -> None:
+        ...
+
+    def set_objective_function(
+        self,
+        function: Union[
+            Callable[[dict[str, int | float]], int | float],
+            Union[MathExpression, MathFunction]
+        ],
+        **kwargs: Any
+    ) -> None:
+        """Set the objective function. In can be a math expression or a math function
+        or even a python function to calculate costs.
 
         This objective function should be of the form:
             ```
@@ -237,9 +224,13 @@ class OptSolver:
             - function (Callable[[dict[str, int | float]]], int | float]): Function to calculate
                 the objective functions to minimize.
         """
-        if not callable(function):
-            raise TypeError("The Objective Function is not a callable.")
-        self._objective = partial(function, **kwargs)
+        if callable(function):
+            self._objective = partial(function, **kwargs)
+        elif isinstance(function, (MathFunction, MathExpression)):
+            self._objective = function.evaluate
+        else:
+            raise NotImplementedError(
+                "The function is not in the expected input parameters")
 
     def solve(self) -> None:
         """Solves the optimization problem.
@@ -317,7 +308,7 @@ class OptSolver:
         # Define their inputs
         inputs = {
             "variables": self._vars,
-            "cost_method": self._objective,
+            "objective": self._objective,
             "constraints": self._constraints
         }
         for key, config in self._config.items():

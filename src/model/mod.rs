@@ -2,6 +2,8 @@
 /// to develop a higher and better implementation of mathematical operations
 ///
 // Import the modules
+mod constraint;
 mod variable;
 // Import the classes
+pub use constraint::Constraint;
 pub use variable::EngineVar;

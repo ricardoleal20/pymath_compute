@@ -11,7 +11,7 @@ from pymath_compute.engine.optimization_methods import (  # type: ignore
 )
 
 if TYPE_CHECKING:
-    from pymath_compute.solvers.opt_solver import Constraint
+    from pymath_compute.solvers.opt_solver import Constraint  # type: ignore
 
 STATUS = Literal["OPTIMAL", "FEASIBLE", "UNFEASIBLE", "NOT_EXECUTED"]
 
@@ -19,7 +19,7 @@ STATUS = Literal["OPTIMAL", "FEASIBLE", "UNFEASIBLE", "NOT_EXECUTED"]
 async def _gradient_descent(  # pylint: disable=R0913
     variables: list[Variable],
     constraints: list["Constraint"],
-    cost_method: Callable[[dict[str, float]], float],
+    objective: Callable[[dict[str, float]], float],
     *,
     finite_var_step: float = 0.001,
     learning_rate: float = 0.001,
@@ -34,7 +34,7 @@ async def _gradient_descent(  # pylint: disable=R0913
 
     Args:
         - variables (list[Variable]): Variables given by the PyMath Module
-        - cost_method (Callable): Method to calculate the cost.
+        - objective (Callable): Method to calculate the cost.
         - var_step (float): Finite step to calculate the gradient
         - learning_rate (float): The learning rate for the variables
         - iterations (int): How many iterations are you going to run as max
@@ -54,7 +54,7 @@ async def _gradient_descent(  # pylint: disable=R0913
     # Just call the gradient descent method from the engine
     return gradient_descent(
         variables,
-        cost_method,
+        objective,
         finite_var_step,
         learning_rate,
         iterations,
