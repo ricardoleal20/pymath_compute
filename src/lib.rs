@@ -3,9 +3,11 @@
 // Import the methods module here
 mod math_utilities;
 mod methods;
+mod model;
 // Import methods
 use math_utilities::*;
 use methods::*;
+use model::EngineVar;
 use pyo3::prelude::*;
 
 /// Mathematical engine for all heavy mathematical computations
@@ -22,6 +24,7 @@ fn engine(py: Python, m: &PyModule) -> PyResult<()> {
     // MODULE METHODS.
     let optimization = build_optimization_module(py)?;
     let utils = build_utils_module(py)?;
+    let models = build_models_module(py)?;
     // ================================================================= //
     // Add all the PyModules to the main m module                        //
     // ================================================================= //
@@ -34,6 +37,9 @@ fn engine(py: Python, m: &PyModule) -> PyResult<()> {
     py.import("sys")?
         .getattr("modules")?
         .set_item("pymath_compute.engine.utils", utils)?;
+    py.import("sys")?
+        .getattr("modules")?
+        .set_item("pymath_compute.engine.model", models)?;
     // Return the result of the module at the very end                   //
     Ok(())
 }
@@ -46,6 +52,10 @@ fn build_optimization_module(py: Python) -> Result<&PyModule, PyErr> {
     // Add the methods inside here
     methods_module.add_function(wrap_pyfunction!(
         training::gradient_descent,
+        methods_module
+    )?)?;
+    methods_module.add_function(wrap_pyfunction!(
+        simulated_annealing::simulated_annealing,
         methods_module
     )?)?;
     // Return the methods module
@@ -73,4 +83,14 @@ fn build_utils_module(py: Python) -> Result<&PyModule, PyErr> {
         .set_item("pymath_compute.engine.utils.derivate", sub_derivate_module)?;
     // Return the methods module
     Ok(utils_module)
+}
+
+/// Build the Models module
+fn build_models_module(py: Python) -> Result<&PyModule, PyErr> {
+    // Let's add a new submodule for the methods
+    let models_module = PyModule::new(py, "model")?;
+    // Add the methods inside here
+    models_module.add_class::<EngineVar>()?;
+    // Return the methods module
+    Ok(models_module)
 }

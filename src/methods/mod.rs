@@ -6,4 +6,5 @@
 //!     - Search methods
 //!     - Training methods
 // Module import
+pub mod simulated_annealing;
 pub mod training;
