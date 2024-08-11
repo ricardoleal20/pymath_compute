@@ -58,6 +58,8 @@ fn build_optimization_module(py: Python) -> Result<&PyModule, PyErr> {
         simulated_annealing::simulated_annealing,
         methods_module
     )?)?;
+    methods_module.add_function(wrap_pyfunction!(search::held_karp, methods_module)?)?;
+    methods_module.add_function(wrap_pyfunction!(search::brute_force, methods_module)?)?;
     // Return the methods module
     Ok(methods_module)
 }

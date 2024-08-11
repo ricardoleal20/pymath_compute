@@ -7,4 +7,4 @@
 pub mod derivate;
 pub mod miscellaneous;
 // Make easier the access to the create ref
-use miscellaneous::convert_to_ref;
+pub use miscellaneous::convert_to_ref;
