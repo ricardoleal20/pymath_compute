@@ -10,6 +10,8 @@ from typing import Optional, Union
 from pymath_compute.model.types import Operators, Bound
 from pymath_compute.model.expression import MathExpression
 from pymath_compute.model.function import MathFunction
+# From the engine, import the Variable
+from pymath_compute.engine.model import EngineVar
 
 
 class Variable:
@@ -28,13 +30,16 @@ class Variable:
     _name: str
     lower_bound: float
     upper_bound: float
-    _value: Optional[float]
+    # Get the variable for the Rust Engine
+    _eng_var: EngineVar
     _is_integer: bool
     # Define the slots to save memory space
     __slots__ = [
-        "_name", "lower_bound",
-                 "upper_bound", "_value",
-                 "_is_integer"
+        "_name",
+        "lower_bound",
+        "upper_bound",
+        "_is_integer",
+        "_eng_var"
     ]
 
     def __init__(
@@ -70,8 +75,11 @@ class Variable:
         self._name = name
         self.lower_bound = lb
         self.upper_bound = ub
-        self._value = value
         self._is_integer = only_integer
+        # Create the engine var
+        self._eng_var = EngineVar(
+            name, lb, ub, value, only_integer
+        )
 
     @property
     def name(self) -> str:
@@ -90,8 +98,8 @@ class Variable:
         Returns:
             float: The current value of the variable.
         """
-        value = self._value if self._value else 0.0
-
+        # Get the var from the EngineVar
+        value = self._eng_var.value
         return int(value) if self._is_integer else value
 
     @value.setter
@@ -106,15 +114,8 @@ class Variable:
             [lower_bound, upper_bound] range, it would
             take the closes bound as the value.
         """
-        # Evaluate if the value is inside the range
-        if self.lower_bound >= new_value:
-            self._value = self.lower_bound
-        elif self.upper_bound <= new_value:
-            self._value = self.upper_bound
-        else:
-            # Set the value
-            self._value = new_value
-        return self._value
+        self._eng_var.set_value(new_value)
+        return self.value
 
     def to_expression(self) -> 'MathExpression':
         """Convert this Variable into a MathExpression"""
@@ -125,8 +126,8 @@ class Variable:
         self.to_expression().plot()
 
     def __repr__(self) -> str:
-        if self._value is not None:
-            return f"{self.name}: {self._value}"
+        if self.value is not None:
+            return f"{self.name}: {self.value}"
         return self.name
 
     # ============================================= #
