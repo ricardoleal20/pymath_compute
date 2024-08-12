@@ -67,7 +67,6 @@ class MathFunction:
                 return self.function(values[self.variable.name])
             if self.variable in values:
                 return self.function(values[self.variable])
-
         return self.function(self.variable.value)
 
     def to_expression(self) -> 'MathExpression':

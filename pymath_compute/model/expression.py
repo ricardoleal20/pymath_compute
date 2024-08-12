@@ -46,6 +46,8 @@ def _evaluate(
     term = 1
     # Iterate over the items
     for item in items:
+        if isinstance(item, str):
+            return 1
         if type(item).__name__ == "Variable":
             if item in values:
                 term *= values[item]
@@ -295,7 +297,6 @@ class MathExpression:
 
     def __eq__(self, other: Union["Variable", "MathFunction", float, int]) -> "MathFunction":
         """Overload the == operator"""
-        from pymath_compute.model.function import MathFunction  # pylint: disable=C0415
         from pymath_compute.utils.math_utils import get_max_int  # pylint: disable=C0415
 
         max_int = get_max_int()
@@ -316,7 +317,55 @@ class MathExpression:
                 f" of type {type(other)} is not implemented"
             )
 
-        return MathFunction(equal_to, self)
+        return self.__generate_function(equal_to, self)
+
+    def __le__(self, other: Union['Variable', float, int]) -> "MathFunction":
+        """Overload the <= operator"""
+        # Generate the expression
+        def less_equal_than(value: int | float) -> int:
+            # Evaluate the kind of value that it is
+            if type(other).__name__ == "Variable":
+                return int(value <= other.value)  # type: ignore
+            return int(value <= other)  # type: ignore
+
+        return self.__generate_function(less_equal_than, self)
+
+    def __lt__(self, other: Union['Variable', float, int]) -> "MathFunction":
+        """Overload the < operator"""
+        # Generate the expression
+        def less_than(value: int | float) -> int:
+            # Evaluate the kind of value that it is
+            if type(other).__name__ == "Variable":
+                return int(value < other.value)  # type: ignore
+            return int(value < other)  # type: ignore
+        return self.__generate_function(less_than, self)
+
+    def __ge__(self, other: Union['Variable', float, int]) -> "MathFunction":
+        """Overload the >= operator"""
+        # Generate the expression
+        def greater_equal_than(value: int | float) -> int:
+            # Evaluate the kind of value that it is
+            if type(other).__name__ == "Variable":
+                return int(value >= other.value)  # type: ignore
+            return int(value >= other)  # type: ignore
+
+        return self.__generate_function(greater_equal_than, self)
+
+    def __gt__(self, other: Union['Variable', float, int]) -> "MathFunction":
+        """Overload the > operator"""
+        # Generate the expression
+        def greater_than(value: int | float) -> int:
+            # Evaluate the kind of value that it is
+            if type(other).__name__ == "Variable":
+                return int(value > other.value)  # type: ignore
+            return int(value > other)  # type: ignore
+
+        return self.__generate_function(greater_than, self)
+
+    def __generate_function(self, *args) -> "MathFunction":
+        """Generate a MathFunction"""
+        from pymath_compute.model.function import MathFunction  # pylint: disable=C0415
+        return MathFunction(*args)
 
     # /////////////////////////// #
     #        HASH METHODS         #

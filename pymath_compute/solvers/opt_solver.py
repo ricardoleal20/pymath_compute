@@ -137,6 +137,21 @@ class OptSolver:
         self._constraints.append(constraint)
         return constraint
 
+    def get_variable(self, variable_name: str) -> Variable:
+        """Return a variable given it's name.
+        
+        Args:
+            - variable_name: str
+
+        Returns:
+            - Variable: Return the Variable
+        """
+        for var in self._vars:
+            if var.name == variable_name:
+                return var
+        raise ValueError(
+            f"The Variable {variable_name} wasn't found on the provided variables."
+        )
 
     def set_variables(self, variables: list[Variable] | Variable) -> None:
         """Set Variables to be considered in the algorithm
@@ -255,11 +270,9 @@ class OptSolver:
         # Solve the problem
         self.__solve_problem()
 
-    def vars_results(self) -> list[Variable]:
-        """If the solver finds a solution, return the variables solution
-
-        Returns:
-            - Return the solution from the optimization
+    @property
+    def variables(self) -> list[Variable]:
+        """Return all the number of variables available in this solver.
         """
         return self._vars
 

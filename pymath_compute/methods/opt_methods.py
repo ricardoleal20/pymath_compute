@@ -68,7 +68,8 @@ async def _held_karp(
     objective: Variable,
 ) -> STATUS:
     """Implementation of the Rust method Held Karp"""
-    return held_karp(variables, constraints, objective)
+    engine_vars = [v._eng_var for v in variables]  # pylint: disable=W0212
+    return held_karp(engine_vars, constraints, objective)
 
 
 async def _brute_force(
@@ -77,7 +78,9 @@ async def _brute_force(
     objective: Variable,
 ) -> STATUS:
     """Implementation of the Rust method Brute Force"""
-    return brute_force(variables, constraints, objective)
+    # Create the list of engine var
+    engine_vars = [v._eng_var for v in variables]  # pylint: disable=W0212
+    return brute_force(engine_vars, constraints, objective)
 
 # ===================== #
 # Define the ENUM class #

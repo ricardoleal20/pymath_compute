@@ -99,7 +99,7 @@ class Variable:
             float: The current value of the variable.
         """
         # Get the var from the EngineVar
-        value = self._eng_var.value
+        value = self._eng_var.value  # type: ignore
         return int(value) if self._is_integer else value
 
     @value.setter
@@ -114,7 +114,7 @@ class Variable:
             [lower_bound, upper_bound] range, it would
             take the closes bound as the value.
         """
-        self._eng_var.set_value(new_value)
+        self._eng_var.set_value(new_value)  # type: ignore
         return self.value
 
     def to_expression(self) -> 'MathExpression':
