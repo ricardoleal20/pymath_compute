@@ -1,3 +1,5 @@
+use core::f64;
+
 use pyo3::prelude::*;
 use pyo3::types::PyDict;
 
@@ -18,30 +20,28 @@ impl Constraint {
         }
     }
 
-    fn __call__(&self, py: Python, values: Option<&PyDict>) -> PyResult<f64> {
-        let const_val = self.value(py, values)?;
-        if const_val == f64::INFINITY {
-            Ok(f64::INFINITY)
-        } else {
-            Ok(const_val)
-        }
-    }
-
     /// Get the value of the constraint.
     ///    
     /// If you constraint is a hard constraint (meaning, that it's weight
     /// is infinite or that is a == expression, ...)
-    fn value(&self, py: Python, values: Option<&PyDict>) -> PyResult<f64> {
+    pub fn value(&self, py: Python, values: Option<&PyDict>) -> PyResult<f64> {
         // Call the `evaluate` method of `_expression` passing the `values`
         let evaluate_func = self
             ._expression
             .call_method(py, "evaluate", (values,), None)?;
-        let result: f64 = evaluate_func.extract(py)?;
-        Ok(self._weight * result)
+        let mut result: f64 = evaluate_func.extract(py)?;
+        result *= self._weight;
+        // Evaluate the result. If it is infinity, then it is a hard constraint
+        // and we shall return infinity. If not, return the normal value
+        if result >= 9223372036854776000.0 {
+            Ok(f64::INFINITY)
+        } else {
+            Ok(result)
+        }
     }
 
     /// Evaluate if the math expression is validated
-    fn is_satisfied(&self, py: Python, values: Option<&PyDict>) -> PyResult<i32> {
+    pub fn is_satisfied(&self, py: Python, values: Option<&PyDict>) -> PyResult<i32> {
         let const_val = self.value(py, values)?;
         if const_val == f64::INFINITY {
             Ok(0)

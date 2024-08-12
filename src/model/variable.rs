@@ -16,10 +16,11 @@ use std::hash::{Hash, Hasher};
 #[derive(Clone)]
 pub struct EngineVar {
     _name: String,
-    lower_bound: f64,
-    upper_bound: f64,
+    pub lower_bound: f64,
+    pub upper_bound: f64,
     _value: Option<f64>,
     _is_integer: bool,
+    _interval_size: f64,
 }
 
 // Implement the hash method for the variable
@@ -58,6 +59,7 @@ impl EngineVar {
                 ));
             }
         }
+        let interval_size: f64 = if only_integer { 1.0 } else { 0.1 };
 
         Ok(EngineVar {
             _name: name,
@@ -71,6 +73,7 @@ impl EngineVar {
                 }
             }),
             _is_integer: only_integer,
+            _interval_size: interval_size,
         })
     }
 
@@ -91,6 +94,27 @@ impl EngineVar {
             x if x > self.upper_bound => self.upper_bound,
             _ => new_value,
         });
+    }
+
+    #[getter]
+    pub fn interval_size(&self) -> f64 {
+        self._interval_size
+    }
+
+    #[setter]
+    pub fn set_interval_size(&mut self, interval_size: f64) {
+        self._interval_size = interval_size;
+    }
+
+    #[getter]
+    pub fn solution_space(&self) -> Vec<f64> {
+        let mut space = vec![self.lower_bound];
+        let mut value = self.lower_bound + self.interval_size();
+        while value <= self.upper_bound {
+            space.push(value);
+            value += self.interval_size();
+        }
+        space
     }
 
     // Hash method for Python

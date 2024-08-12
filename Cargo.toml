@@ -17,6 +17,7 @@ classifiers = [
 
 
 [dependencies]
+itertools = "0.13.0"
 pyo3 = { version = "0.16", features = ["extension-module"] }
 rand = "0.8.5"
 
