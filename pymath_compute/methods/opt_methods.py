@@ -7,7 +7,7 @@ from functools import partial
 # Local imports
 from pymath_compute.model import Variable
 from pymath_compute.engine.optimization_methods import (  # type: ignore
-    gradient_descent, held_karp, brute_force  # type: ignore
+    gradient_descent, held_karp, brute_force, simulated_annealing  # type: ignore
 )
 
 if TYPE_CHECKING:
@@ -82,6 +82,17 @@ async def _brute_force(
     engine_vars = [v._eng_var for v in variables]  # pylint: disable=W0212
     return brute_force(engine_vars, constraints, objective)
 
+
+async def _simulated_annealing(
+    variables: list[Variable],
+    constraints: list["Constraint"],
+    objective: Variable,
+) -> STATUS:
+    """Implementation of the Rust method Simulated Annealing"""
+    # Create the list of engine var
+    engine_vars = [v._eng_var for v in variables]  # pylint: disable=W0212
+    return simulated_annealing(engine_vars, constraints, objective)
+
 # ===================== #
 # Define the ENUM class #
 # ===================== #
@@ -94,7 +105,9 @@ class OptMethods(Enum):
         * GRADIENT_DESCENT
         * HELD_KARP
         * BRUTE_FORCE
+        * SIMULATED_ANNEALING
     """
     GRADIENT_DESCENT = partial(_gradient_descent)
     HELD_KARP = partial(_held_karp)
     BRUTE_FORCE = partial(_brute_force)
+    SIMULATED_ANNEALING = partial(_simulated_annealing)
