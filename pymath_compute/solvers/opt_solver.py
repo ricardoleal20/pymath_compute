@@ -9,12 +9,11 @@ Classes:
     - OptSolver: Class for solving optimization problems.
     - OptSolverConfig: Configuration for the solver method
 """
-import asyncio
 import time
 from functools import partial
 from typing import (
     Literal, Callable, TypedDict,
-    Awaitable, Any, Union,
+    Any, Union,
     overload
 )
 # Local imports
@@ -47,8 +46,7 @@ class OptSolverConfig(_Config, total=False):
 
 
 class OptSolver:
-    """
-    Class OptSolver for solving optimization problems.
+    """Class OptSolver for solving optimization problems.
     
     Attributes:
         - status: Status of the solver.
@@ -292,32 +290,18 @@ class OptSolver:
         # Get the initial time of exec
         start_time = time.time()
         # Get the status
-        try:
-            self._status = asyncio.run(
-                self.__execute_with_timeout_async(
-                    self._config["solver_method"].value,
-                    self._config["solver_time"]
-                )
-            )
-        except TimeoutError:
-            self._status = "FEASIBLE"
-        except Exception as e:  # pylint: disable=W0718
-            print("Error executing the algorithm:", e)
-            self._status = "UNFEASIBLE"
+        self._status = self.__method_executer()
         print(
             f"Solver ending with status {self._status}" +
             f" in {round(time.time() - start_time, 3)}s."
         )
 
     # ========================================== #
-    #               Async executer               #
+    #              Method executed               #
     # ========================================== #
-    async def __execute_with_timeout_async(
-        self,
-        function: Callable[..., Awaitable[STATUS]],
-        timeout: float
-    ) -> STATUS:
-        """Execute the optimization function using a timeout"""
+    def __method_executer(self) -> STATUS:
+        """..."""
+        method = self._config["solver_method"].value
         # Define their inputs
         inputs = {
             "variables": self._vars,
@@ -325,15 +309,7 @@ class OptSolver:
             "constraints": self._constraints
         }
         for key, config in self._config.items():
-            if key not in ["solver_method", "solver_time"]:
+            if key != "solver_method":
                 inputs[key] = config
-        try:
-            return await asyncio.wait_for(
-                function(**inputs),
-                timeout
-            )
-        except asyncio.TimeoutError:
-            raise TimeoutError(  # pylint: disable=W0707
-                "Function execution timed out")
-        except Exception as e:
-            raise e
+        # Call the method and return the status
+        return method(**inputs)

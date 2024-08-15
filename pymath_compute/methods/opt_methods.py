@@ -16,7 +16,7 @@ if TYPE_CHECKING:
 STATUS = Literal["OPTIMAL", "FEASIBLE", "UNFEASIBLE", "NOT_EXECUTED"]
 
 
-async def _gradient_descent(  # pylint: disable=R0913
+def _gradient_descent(  # pylint: disable=R0913
     variables: list[Variable],
     constraints: list["Constraint"],
     objective: Callable[[dict[str, float]], float],
@@ -25,6 +25,7 @@ async def _gradient_descent(  # pylint: disable=R0913
     learning_rate: float = 0.001,
     iterations: int = 1000,
     tol: float = 1e-6,
+    **_kwargs
 ) -> STATUS:
     """Gradient Descent implementation
 
@@ -61,7 +62,8 @@ async def _gradient_descent(  # pylint: disable=R0913
         tol
     )
 
-async def _brute_force(
+
+def _brute_force(
     variables: list[Variable],
     constraints: list["Constraint"],
     objective: Variable,
@@ -72,15 +74,16 @@ async def _brute_force(
     return brute_force(engine_vars, constraints, objective)
 
 
-async def _simulated_annealing(
+def _simulated_annealing(
     variables: list[Variable],
     constraints: list["Constraint"],
     objective: Variable,
+    **inputs,
 ) -> STATUS:
     """Implementation of the Rust method Simulated Annealing"""
     # Create the list of engine var
     engine_vars = [v._eng_var for v in variables]  # pylint: disable=W0212
-    return simulated_annealing(engine_vars, constraints, objective)
+    return simulated_annealing(engine_vars, constraints, objective, **inputs)
 
 # ===================== #
 # Define the ENUM class #
