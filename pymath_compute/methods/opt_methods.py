@@ -7,7 +7,7 @@ from functools import partial
 # Local imports
 from pymath_compute.model import Variable
 from pymath_compute.engine.optimization_methods import (  # type: ignore
-    gradient_descent, held_karp, brute_force, simulated_annealing  # type: ignore
+    gradient_descent, brute_force, simulated_annealing  # type: ignore
 )
 
 if TYPE_CHECKING:
@@ -61,17 +61,6 @@ async def _gradient_descent(  # pylint: disable=R0913
         tol
     )
 
-
-async def _held_karp(
-    variables: list[Variable],
-    constraints: list["Constraint"],
-    objective: Variable,
-) -> STATUS:
-    """Implementation of the Rust method Held Karp"""
-    engine_vars = [v._eng_var for v in variables]  # pylint: disable=W0212
-    return held_karp(engine_vars, constraints, objective)
-
-
 async def _brute_force(
     variables: list[Variable],
     constraints: list["Constraint"],
@@ -103,11 +92,9 @@ class OptMethods(Enum):
     
     Available methods are:
         * GRADIENT_DESCENT
-        * HELD_KARP
         * BRUTE_FORCE
         * SIMULATED_ANNEALING
     """
     GRADIENT_DESCENT = partial(_gradient_descent)
-    HELD_KARP = partial(_held_karp)
     BRUTE_FORCE = partial(_brute_force)
     SIMULATED_ANNEALING = partial(_simulated_annealing)

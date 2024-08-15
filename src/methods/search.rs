@@ -1,6 +1,3 @@
-use std::collections::HashMap;
-use std::hash::Hash;
-
 /// Include several optimization techniques.
 /// For this module, the techniques are of type `search`,
 /// since we're searching.
@@ -8,39 +5,12 @@ use std::hash::Hash;
 use pyo3::prelude::*;
 use pyo3::types::PyDict;
 use pyo3::PyResult;
+use std::collections::HashMap;
 // Local imports
 use crate::math_utilities::{
     convert_to_constraint_ref, convert_to_var_ref, generate_solution_combinations,
 };
 use crate::model::Constraint;
-
-#[pyfunction]
-pub fn held_karp(_py: Python, variables: &PyAny, constraints: &PyAny) -> PyResult<&'static str> {
-    // Provide the status
-    let status = "UNFEASIBLE";
-    // Get the mut variables and constraints
-    let ref_vars = convert_to_var_ref(variables)?;
-    let ref_const = convert_to_constraint_ref(constraints)?;
-    // Get the variable names
-    let variable_names: Vec<&str> = ref_vars.keys().cloned().collect();
-    let n_variables = variable_names.len();
-    // Create the distances matrix
-    let distances_matrix = build_distance_matrix(n_variables, &ref_const);
-    // Create the best solution and best cost
-    let mut best_cost = (2147483647, f64::INFINITY);
-    // Create the HashMap of visited cities
-    let nodes_visited: HashMap<i32, HashMap<i32, i32>> = HashMap::new();
-    // Iterate over all the variables
-    for (prev_var_name, prev_var) in &ref_vars {
-        for (next_var_name, next_var) in &ref_vars {
-            if prev_var_name == next_var_name {
-                continue;
-            }
-        }
-    }
-    // Return the status at the very end
-    Ok(status)
-}
 
 #[pyfunction]
 pub fn brute_force(
@@ -109,30 +79,6 @@ pub fn brute_force(
 // ============================== //
 //         Extra methods          //
 // ============================== //
-fn build_distance_matrix(
-    n_of_elements: usize,
-    constraints: &Vec<PyRefMut<Constraint>>,
-) -> Vec<Vec<f64>> {
-    // Create the matrix
-    let mut distances = vec![vec![f64::INFINITY; n_of_elements]; n_of_elements];
-    // Iterate over the number of elements
-    for i in 0..n_of_elements {
-        for j in 0..n_of_elements {
-            // If i == j, then continue
-            if i == j {
-                continue;
-            }
-            // If not, then build the new distance element
-            let dist_key = format!("DIST_{}_{}", i, j);
-            if let Some(&constraint) = constraints.get(&dist_key) {
-                // Set this constraint element as an distance
-                distances[i][j] = constraint;
-            }
-        }
-    }
-    // Return the matrix
-    distances
-}
 
 // ============================== //
 //      Evaluation methods        //
