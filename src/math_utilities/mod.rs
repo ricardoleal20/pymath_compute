@@ -8,5 +8,5 @@ pub mod derivate;
 pub mod miscellaneous;
 // Make easier the access to the create ref
 pub use miscellaneous::{
-    convert_to_constraint_ref, convert_to_var_ref, generate_solution_combinations,
+    convert_to_constraint_ref, convert_to_var_ref, generate_solution_combinations, update_results,
 };

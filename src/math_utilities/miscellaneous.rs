@@ -2,7 +2,7 @@
 ///
 use itertools::{Itertools, MultiProduct};
 use pyo3::prelude::*;
-use pyo3::types::PyList;
+use pyo3::types::{PyDict, PyList};
 use std::collections::HashMap;
 use std::vec::IntoIter;
 // Local imports
@@ -44,6 +44,25 @@ pub fn convert_to_constraint_ref(variables: &PyAny) -> Result<Vec<PyRefMut<Const
     }
     // Return the ref
     Ok(constraint)
+}
+
+pub fn update_results(results: &PyDict, vars: &HashMap<&str, &PyCell<EngineVar>>) -> PyResult<()> {
+    // Update the
+    for (py_ind, py_val) in results {
+        // Convert the PyObject `var_ind` into a usize
+        let var_ind: &str = py_ind.extract()?;
+        // Convert the PyObject `value` into a f64
+        let value: f64 = py_val.extract()?;
+        // Using the var index, search the solution dict
+        if let Some(py_cell) = vars.get(&var_ind) {
+            // Borrow the cell
+            let mut variable = py_cell.borrow_mut();
+            // Set the new value
+            variable.set_value(value);
+        }
+    }
+    // Return nothing
+    Ok(())
 }
 
 pub fn generate_solution_combinations(

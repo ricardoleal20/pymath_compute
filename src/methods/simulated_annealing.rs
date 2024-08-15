@@ -2,8 +2,9 @@ use pyo3::prelude::*;
 use pyo3::types::PyDict;
 use rand::Rng;
 use std::collections::HashMap;
+use std::time::Instant;
 // Extra import
-use crate::math_utilities::{convert_to_constraint_ref, convert_to_var_ref};
+use crate::math_utilities::{convert_to_constraint_ref, convert_to_var_ref, update_results};
 use crate::model::{Constraint, EngineVar};
 
 // SA parameters
@@ -19,6 +20,8 @@ pub fn simulated_annealing(
     variables: &PyAny,
     constraints: &PyAny,
     objective: PyObject,
+    // Extra methods, such as solver time
+    solver_time: f64,
 ) -> PyResult<&'static str> {
     // Init the random generator
     let mut rng = rand::thread_rng();
@@ -30,16 +33,21 @@ pub fn simulated_annealing(
     let keys: Vec<&str> = ref_vars.keys().cloned().collect();
     // Generate a hint solution and a best cost
     let hint = hint_solution(py, &ref_vars)?;
-    let best_solution = hint.extract(py)?;
+    let mut best_solution = hint.extract(py)?;
     let mut best_cost =
         evaluate_constraints_and_objective(py, best_solution, &ref_const, &objective)?;
     // Define the temperature
     let mut temperature = INITIAL_TEMPERATURE;
+    // Start the timing count
+    let timer = Instant::now();
+    let mut timeout = timer.elapsed().as_secs_f64();
     // Start the optimization process
-    while temperature > 1e-3 {
+    while temperature > 1e-3 && timeout < solver_time {
         // Create a copy of the best solution
         let current_solution = best_solution.copy()?;
         for _ in 0..MAX_ITERATIONS {
+            // Update the time
+            timeout = timer.elapsed().as_secs_f64();
             // Generate a neighborhood solution. For this, randomly select a var from the keys
             let selected_var_name = keys[rng.gen_range(0..keys.len())];
             let selected_var = ref_vars[selected_var_name];
@@ -57,30 +65,27 @@ pub fn simulated_annealing(
 
             // Evaluate if this is better
             if current_cost < best_cost || metropolis_prob {
-                best_cost = current_cost;
                 // Update all the elements
-                if current_cost.0 == 0 {
+                if current_cost.0 == 0 && current_cost.1 <= best_cost.1 {
                     status = "FEASIBLE";
-                    for (py_ind, py_val) in current_solution {
-                        // Convert the PyObject `var_ind` into a usize
-                        let var_ind: &str = py_ind.extract()?;
-                        // Convert the PyObject `value` into a f64
-                        let value: f64 = py_val.extract()?;
-                        // Using the var index, search the solution dict
-                        if let Some(py_cell) = ref_vars.get(&var_ind) {
-                            // Borrow the cell
-                            let mut variable = py_cell.borrow_mut();
-                            // Set the new value
-                            variable.set_value(value);
-                        }
-                        // Also, update the best solution
-                        let _ = best_solution.set_item(var_ind, value);
-                    }
+                    println!(
+                        "Solution found at {}s with cost {}",
+                        timer.elapsed().as_secs_f64(),
+                        current_cost.1
+                    );
+                    // Update the best solution
+                    best_solution = current_solution;
                 }
+                // Update the cost
+                best_cost = current_cost;
             }
         }
         // Reduce the temperature using the cooling rate
         temperature *= COOLING_RATE;
+    }
+    // If the status is other than "UNFEASIBLE"
+    if status != "UNFEASIBLE" {
+        update_results(best_solution, &ref_vars)?;
     }
     // Return the status
     Ok(status)
